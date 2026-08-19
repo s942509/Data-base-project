@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
-"""
-流動球體風格 Streamlit 簡報
-"""
+"""Single-stage animated Streamlit presentation."""
+
+import json
 
 import streamlit as st
 import streamlit.components.v1 as components
 
-
-# ============================================================
-# Streamlit 基本設定
-# ============================================================
 
 st.set_page_config(
     page_title="データ基盤構築の考え方と業務自動化",
@@ -19,24 +15,20 @@ st.set_page_config(
 )
 
 
-# ============================================================
-# 投影片內容
-# ============================================================
-
 SLIDES = [
     {
         "type": "title",
-        "title_lines": [
-            "データ基盤構築の考え方と",
-            "業務自動化",
-        ],
+        "eyebrow": "DATA PLATFORM / AUTOMATION",
+        "title": "データ基盤構築の考え方と<br>業務自動化",
         "reporter": "Reporter: XXX",
         "date": "XX.XX.XX",
+        "ball1": {"x": 74, "y": 73, "size": 45},
+        "ball2": {"x": 48, "y": 82, "size": 27},
     },
     {
         "type": "toc",
-        "heading": "Contents",
-        "subtitle": "本日の流れ",
+        "eyebrow": "TODAY'S FLOW",
+        "title": "Contents",
         "items": [
             "経歴と提案の背景",
             "自動化の実例と成果",
@@ -45,6 +37,8 @@ SLIDES = [
             "導入方法と期待効果",
             "今後の進め方",
         ],
+        "ball1": {"x": -8, "y": 48, "size": 38},
+        "ball2": {"x": 18, "y": 74, "size": 23},
     },
     {
         "type": "section",
@@ -54,17 +48,21 @@ SLIDES = [
             "（ここに内容を記載）",
             "（ここに内容を記載）",
         ],
+        "ball1": {"x": -10, "y": 44, "size": 40},
+        "ball2": {"x": 17, "y": 70, "size": 22},
     },
     {
         "type": "section",
         "num": "02",
         "title": "自動化の実例と成果",
         "points": [
-            "日報タブの月次複製をGASで自動化（テーブル名・数式参照・日付を自動更新）",
-            "収益実績シートの出荷金額・返品金額・数量集計をGAS関数で自動更新",
-            "広告実績データをPython（gspread）で取得し、レート換算のうえ月次日報へ反映",
-            "週報と日報をGASで連携し、媒体別（Facebook / GSEM / YouTube）の実績を自動集計",
+            "日報タブの月次複製をGASで自動化",
+            "収益実績シートの金額・数量集計を自動更新",
+            "広告実績をPythonで取得し、月次日報へ反映",
+            "週報と日報を連携し、媒体別実績を自動集計",
         ],
+        "ball1": {"x": 72, "y": -18, "size": 37},
+        "ball2": {"x": 84, "y": 25, "size": 19},
     },
     {
         "type": "section",
@@ -75,6 +73,8 @@ SLIDES = [
             "（ここに内容を記載）",
             "（ここに内容を記載）",
         ],
+        "ball1": {"x": -12, "y": 50, "size": 39},
+        "ball2": {"x": 21, "y": 9, "size": 18},
     },
     {
         "type": "section",
@@ -84,6 +84,8 @@ SLIDES = [
             "（ここに内容を記載）",
             "（ここに内容を記載）",
         ],
+        "ball1": {"x": 69, "y": 65, "size": 42},
+        "ball2": {"x": 55, "y": 50, "size": 20},
     },
     {
         "type": "section",
@@ -93,6 +95,8 @@ SLIDES = [
             "（ここに内容を記載）",
             "（ここに内容を記載）",
         ],
+        "ball1": {"x": -9, "y": -16, "size": 38},
+        "ball2": {"x": 17, "y": 18, "size": 20},
     },
     {
         "type": "section",
@@ -102,1192 +106,480 @@ SLIDES = [
             "（ここに内容を記載）",
             "（ここに内容を記載）",
         ],
+        "ball1": {"x": 70, "y": 62, "size": 43},
+        "ball2": {"x": 50, "y": 76, "size": 21},
     },
 ]
 
 
-CANVAS_W = 1160
-CANVAS_H = 653
+slides_json = json.dumps(SLIDES, ensure_ascii=False)
 
 
-# ============================================================
-# 共用 CSS
-# ============================================================
+HTML = r"""
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root {
+    --ink: #4b3586;
+    --purple: #7135de;
+    --soft-purple: #a982ee;
+    --line: rgba(108, 70, 181, .16);
+  }
 
-BASE_CSS = f"""
-* {{
-    box-sizing: border-box;
-}}
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: transparent; overflow: hidden; }
+  button { font: inherit; }
 
-html,
-body {{
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    overflow: hidden;
-}}
+  .shell {
+    width: 100%;
+    padding: 6px 8px 0;
+    font-family: "Noto Sans JP", "Yu Gothic", "Microsoft JhengHei", Arial, sans-serif;
+  }
 
-.viewport {{
+  .stage {
     position: relative;
     width: 100%;
-    height: {CANVAS_H}px;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
-}}
-
-.stage {{
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: {CANVAS_W}px;
-    height: {CANVAS_H}px;
-
-    transform-origin: top center;
-    transform: translateX(-50%);
-
-    overflow: hidden;
-    border-radius: 28px;
-
+    isolation: isolate;
+    border-radius: clamp(16px, 2vw, 30px);
     background:
-        radial-gradient(
-            circle at 88% 12%,
-            rgba(221, 205, 255, 0.32) 0%,
-            transparent 30%
-        ),
-        linear-gradient(
-            145deg,
-            #fcfaff 0%,
-            #f7f2fd 52%,
-            #f1e8fc 100%
-        );
+      radial-gradient(circle at 85% 10%, rgba(225,211,252,.38), transparent 29%),
+      linear-gradient(145deg, #fcfaff 0%, #f7f2fd 54%, #f0e7fb 100%);
+    box-shadow: 0 24px 70px rgba(30, 13, 61, .28);
+    cursor: pointer;
+    user-select: none;
+  }
 
-    box-shadow:
-        0 18px 55px rgba(54, 28, 100, 0.16);
-
-    font-family:
-        "Noto Sans JP",
-        "Hiragino Kaku Gothic ProN",
-        "Yu Gothic",
-        "Microsoft JhengHei",
-        "Helvetica Neue",
-        Arial,
-        sans-serif;
-}}
-
-
-/* ------------------------------------------------------------
-   球體共用樣式
------------------------------------------------------------- */
-
-.circle,
-.ball-a,
-.ball-b {{
-    position: absolute;
-    display: block;
-    border-radius: 50%;
-    overflow: hidden;
-
-    will-change: transform, opacity;
-    animation-fill-mode: forwards;
-    animation-timing-function: cubic-bezier(.22, .9, .32, 1);
-}}
-
-
-/* 主球 */
-
-.ball-a {{
-    z-index: 1;
-
-    background:
-        radial-gradient(
-            circle at 29% 24%,
-            rgba(255, 255, 255, 0.92) 0%,
-            rgba(224, 209, 255, 0.88) 13%,
-            rgba(183, 148, 247, 0.95) 36%,
-            rgba(139, 92, 246, 0.98) 67%,
-            rgba(94, 45, 190, 1) 100%
-        );
-
-    box-shadow:
-        inset -40px -46px 70px rgba(54, 17, 130, 0.34),
-        inset 26px 24px 48px rgba(255, 255, 255, 0.30),
-        0 32px 65px rgba(109, 40, 217, 0.25);
-
-    animation-name: ballInA;
-    animation-duration: 1.20s;
-}}
-
-
-/* 副球 */
-
-.ball-b {{
-    z-index: 2;
-
-    background:
-        radial-gradient(
-            circle at 30% 25%,
-            rgba(255, 255, 255, 0.96) 0%,
-            rgba(235, 225, 255, 0.92) 16%,
-            rgba(200, 174, 250, 0.90) 42%,
-            rgba(166, 122, 239, 0.92) 72%,
-            rgba(121, 75, 211, 0.96) 100%
-        );
-
-    box-shadow:
-        inset -28px -34px 54px rgba(71, 31, 150, 0.24),
-        inset 20px 18px 38px rgba(255, 255, 255, 0.36),
-        0 24px 48px rgba(109, 40, 217, 0.20);
-
-    animation-name: ballInB;
-    animation-duration: 1.32s;
-    animation-delay: 0.08s;
-}}
-
-
-/* 球體表面的光點 */
-
-.ball-a::after,
-.ball-b::after {{
+  .stage::before {
     content: "";
     position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(115deg, rgba(255,255,255,.28), transparent 48%);
+  }
 
-    top: 12%;
-    left: 17%;
-
-    width: 27%;
-    height: 18%;
-
+  .orb {
+    position: absolute;
+    z-index: 1;
+    width: calc(var(--size) * 1%);
+    aspect-ratio: 1;
+    left: calc(var(--x) * 1%);
+    top: calc(var(--y) * 1%);
     border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition:
+      left 900ms cubic-bezier(.65,0,.25,1),
+      top 900ms cubic-bezier(.65,0,.25,1),
+      width 900ms cubic-bezier(.65,0,.25,1),
+      opacity 360ms ease;
+    will-change: left, top, width;
+  }
 
-    background:
-        radial-gradient(
-            ellipse,
-            rgba(255, 255, 255, 0.66) 0%,
-            rgba(255, 255, 255, 0.18) 45%,
-            transparent 72%
-        );
+  .orb-a {
+    opacity: .92;
+    background: radial-gradient(circle at 29% 24%,
+      #fff 0%, #e6d8ff 11%, #c3a1f7 32%, #9560ed 64%, #6427c9 100%);
+    box-shadow:
+      inset -3.2vw -3.4vw 5.5vw rgba(52,14,127,.27),
+      inset 2vw 1.7vw 4vw rgba(255,255,255,.28),
+      0 2.1vw 4.7vw rgba(92,39,188,.22);
+  }
 
+  .orb-b {
+    z-index: 2;
+    opacity: .68;
+    background: radial-gradient(circle at 30% 24%,
+      #fff 0%, #eee6ff 14%, #d1bafa 39%, #ad82ed 70%, #8350d5 100%);
+    box-shadow:
+      inset -2vw -2.2vw 4vw rgba(55,17,130,.20),
+      inset 1.5vw 1.2vw 3vw rgba(255,255,255,.34),
+      0 1.5vw 3.4vw rgba(92,39,188,.18);
+  }
+
+  .orb::after {
+    content: "";
+    position: absolute;
+    left: 17%; top: 12%; width: 28%; height: 18%;
+    border-radius: 50%;
     transform: rotate(-25deg);
     filter: blur(2px);
-}}
+    background: radial-gradient(ellipse, rgba(255,255,255,.75), transparent 70%);
+  }
 
-
-/* ------------------------------------------------------------
-   球體移動
------------------------------------------------------------- */
-
-@keyframes ballInA {{
-    0% {{
-        transform:
-            translate(var(--dxA), var(--dyA))
-            scale(0.30)
-            rotate(-14deg);
-
-        opacity: 0;
-    }}
-
-    58% {{
-        opacity: 0.95;
-    }}
-
-    74% {{
-        transform:
-            translate(-18px, 10px)
-            scale(1.07)
-            rotate(3deg);
-
-        opacity: 0.95;
-    }}
-
-    88% {{
-        transform:
-            translate(7px, -4px)
-            scale(0.98)
-            rotate(-1deg);
-    }}
-
-    100% {{
-        transform:
-            translate(0, 0)
-            scale(1)
-            rotate(0);
-
-        opacity: 0.95;
-    }}
-}}
-
-
-@keyframes ballInB {{
-    0% {{
-        transform:
-            translate(var(--dxB), var(--dyB))
-            scale(0.24)
-            rotate(18deg);
-
-        opacity: 0;
-    }}
-
-    58% {{
-        opacity: 0.72;
-    }}
-
-    72% {{
-        transform:
-            translate(15px, -9px)
-            scale(1.09)
-            rotate(-4deg);
-
-        opacity: 0.72;
-    }}
-
-    88% {{
-        transform:
-            translate(-5px, 4px)
-            scale(0.97)
-            rotate(1deg);
-    }}
-
-    100% {{
-        transform:
-            translate(0, 0)
-            scale(1)
-            rotate(0);
-
-        opacity: 0.72;
-    }}
-}}
-
-
-/* ------------------------------------------------------------
-   文字動畫：等球體移動後再出現
------------------------------------------------------------- */
-
-.textup {{
-    opacity: 0;
-    transform: translateY(24px);
-
-    animation-name: textIn;
-    animation-duration: 0.68s;
-    animation-timing-function: cubic-bezier(.22, .9, .32, 1);
-    animation-fill-mode: forwards;
-}}
-
-@keyframes textIn {{
-    0% {{
-        opacity: 0;
-        transform: translateY(24px);
-        filter: blur(4px);
-    }}
-
-    100% {{
-        opacity: 1;
-        transform: translateY(0);
-        filter: blur(0);
-    }}
-}}
-
-
-.pagefoot {{
+  .content {
     position: absolute;
-    right: 34px;
-    bottom: 22px;
-
+    inset: 0;
     z-index: 5;
+    pointer-events: none;
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+    transition: opacity 280ms ease, transform 380ms ease, filter 380ms ease;
+  }
 
-    color: #9c87d9;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-
+  .content.out {
     opacity: 0;
+    transform: translateY(-12px);
+    filter: blur(5px);
+  }
 
-    animation: textIn 0.55s ease 1.85s forwards;
-}}
+  .content.in {
+    animation: contentIn 650ms cubic-bezier(.22,.9,.32,1) both;
+  }
 
+  @keyframes contentIn {
+    from { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+    to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
 
-/* ------------------------------------------------------------
-   窄螢幕自動縮放
------------------------------------------------------------- */
+  .eyebrow {
+    color: #9370df;
+    font-size: clamp(9px, 1vw, 14px);
+    font-weight: 800;
+    letter-spacing: .22em;
+    margin-bottom: 1.2vw;
+  }
 
-@media (max-width: 1160px) {{
-    .stage {{
-        left: 0;
-        transform: scale(calc(100vw / {CANVAS_W}));
-        transform-origin: top left;
-    }}
+  .title-layout {
+    position: absolute;
+    left: 7%; top: 32%;
+    width: 61%;
+  }
 
-    .viewport {{
-        height: calc({CANVAS_H}px * (100vw / {CANVAS_W}));
-    }}
-}}
+  .main-title {
+    margin: 0;
+    color: #6625d1;
+    font-size: clamp(24px, 4vw, 55px);
+    font-weight: 900;
+    line-height: 1.22;
+    letter-spacing: .01em;
+  }
 
+  .meta {
+    display: flex;
+    gap: 2.2vw;
+    margin-top: 3vw;
+    color: #765bb8;
+    font-size: clamp(10px, 1.2vw, 16px);
+  }
 
-/* 使用者關閉動畫時 */
+  .toc-layout {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 40% 60%;
+    align-items: center;
+  }
 
-@media (prefers-reduced-motion: reduce) {{
-    .circle,
-    .ball-a,
-    .ball-b,
-    .textup,
-    .pagefoot {{
-        animation: none !important;
-        opacity: 1 !important;
-        transform: none !important;
-        filter: none !important;
-    }}
-}}
-"""
+  .toc-heading { padding-left: 10%; }
+  .toc-heading h1 {
+    margin: 0;
+    color: #6929d4;
+    font-size: clamp(27px, 4vw, 52px);
+  }
 
+  .toc-list { width: 84%; }
+  .toc-row {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    align-items: baseline;
+    gap: 10px;
+    padding: clamp(7px, 1vw, 14px) 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .toc-num { color: #9669eb; font-weight: 800; font-size: clamp(10px, 1.1vw, 15px); }
+  .toc-text { color: var(--ink); font-weight: 750; font-size: clamp(13px, 1.65vw, 22px); }
 
-# ============================================================
-# HTML 輔助函式
-# ============================================================
+  .section-layout {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 39% 61%;
+    align-items: center;
+  }
+  .section-mark { padding-left: 12%; color: white; text-shadow: 0 2px 14px rgba(60,20,130,.28); }
+  .section-num { font-size: clamp(28px, 4.4vw, 61px); font-weight: 900; letter-spacing: .08em; }
+  .section-label { font-size: clamp(9px, 1vw, 14px); font-weight: 700; letter-spacing: .2em; }
+  .section-copy { width: 86%; padding-right: 4%; }
+  .section-copy h1 {
+    margin: 0 0 1.2vw;
+    color: #56349e;
+    font-size: clamp(23px, 3.2vw, 44px);
+    line-height: 1.25;
+  }
+  .rule { width: 74px; height: 4px; border-radius: 8px; background: linear-gradient(90deg,#8b5cf6,#ccb3f6); margin-bottom: 1.8vw; }
+  .points { margin: 0; padding: 0; list-style: none; }
+  .points li {
+    position: relative;
+    margin: 0 0 clamp(7px, 1vw, 14px);
+    padding-left: 20px;
+    color: #5c4a89;
+    font-size: clamp(11px, 1.35vw, 18px);
+    line-height: 1.55;
+  }
+  .points li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: .65em;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #9765eb;
+    box-shadow: 0 0 0 5px rgba(151,101,235,.11);
+  }
 
-def points_html(points, delay_base=1.72, step=0.13):
-    result = []
+  .hud {
+    position: absolute;
+    z-index: 10;
+    left: 4%; right: 4%; bottom: 3.2%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+  }
+  .progress { display: flex; gap: 7px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(106,67,178,.20); transition: width .3s, background .3s; }
+  .dot.active { width: 24px; border-radius: 8px; background: #8b5cf6; }
+  .counter { color: #8f72d0; font-size: clamp(9px, .9vw, 13px); font-weight: 800; letter-spacing: .14em; }
 
-    for index, point in enumerate(points):
-        delay = delay_base + index * step
+  .next-hint {
+    position: absolute;
+    z-index: 12;
+    right: 3.4%; top: 4.8%;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 1px solid rgba(119,76,198,.18);
+    border-radius: 999px;
+    padding: 8px 13px;
+    color: #7651be;
+    background: rgba(255,255,255,.40);
+    backdrop-filter: blur(8px);
+    font-size: clamp(9px, .9vw, 13px);
+    font-weight: 800;
+    letter-spacing: .1em;
+    pointer-events: none;
+  }
 
-        result.append(
-            f"""
-            <li
-                class="textup"
-                style="animation-delay:{delay:.2f}s"
-            >
-                {point}
-            </li>
-            """
-        )
+  .ripple {
+    position: absolute;
+    z-index: 20;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(116,64,211,.45);
+    border-radius: 50%;
+    transform: translate(-50%,-50%) scale(.2);
+    animation: ripple 620ms ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes ripple { to { opacity: 0; transform: translate(-50%,-50%) scale(8); } }
 
-    return "\n".join(result)
+  @media (max-width: 620px) {
+    .toc-row { grid-template-columns: 30px 1fr; }
+    .points li { padding-left: 13px; }
+    .points li::before { width: 5px; height: 5px; box-shadow: none; }
+    .next-hint { padding: 5px 8px; }
+  }
 
+  @media (prefers-reduced-motion: reduce) {
+    .orb, .content { transition-duration: 1ms !important; animation-duration: 1ms !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="shell">
+    <main class="stage" id="stage" aria-label="Animated presentation; click for next scene">
+      <div class="orb orb-a" id="orbA"></div>
+      <div class="orb orb-b" id="orbB"></div>
+      <section class="content" id="content"></section>
+      <div class="next-hint" id="nextHint">CLICK <span>→</span></div>
+      <div class="hud">
+        <div class="progress" id="progress"></div>
+        <div class="counter" id="counter"></div>
+      </div>
+    </main>
+  </div>
 
-# ============================================================
-# 首頁
-# ============================================================
+<script>
+  const slides = __SLIDES__;
+  const stage = document.getElementById('stage');
+  const content = document.getElementById('content');
+  const orbA = document.getElementById('orbA');
+  const orbB = document.getElementById('orbB');
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('counter');
+  const nextHint = document.getElementById('nextHint');
 
-def render_title(slide):
-    lines_html = "".join(
-        f"<div>{line}</div>"
-        for line in slide["title_lines"]
-    )
+  let index = 0;
+  let busy = false;
 
-    return f"""
-    <!DOCTYPE html>
-    <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            {BASE_CSS}
+  function escapeText(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
 
-            .title-small-orb {{
-                position: absolute;
-                top: -80px;
-                left: -75px;
+  function setOrb(orb, data) {
+    orb.style.setProperty('--x', data.x);
+    orb.style.setProperty('--y', data.y);
+    orb.style.setProperty('--size', data.size);
+  }
 
-                width: 235px;
-                height: 235px;
-
-                z-index: 0;
-                border-radius: 50%;
-
-                background:
-                    radial-gradient(
-                        circle at 62% 64%,
-                        #d4bdfa 0%,
-                        #eee5fc 63%,
-                        rgba(255,255,255,0) 72%
-                    );
-
-                opacity: 0.78;
-            }}
-
-            .title-line {{
-                position: absolute;
-                top: 90px;
-                right: 74px;
-
-                width: 2px;
-                height: 410px;
-
-                z-index: 4;
-
-                background:
-                    linear-gradient(
-                        to bottom,
-                        #8b5cf6,
-                        rgba(200, 179, 245, 0.30)
-                    );
-            }}
-
-            .title-line-dot {{
-                position: absolute;
-                top: 81px;
-                right: 66px;
-
-                width: 18px;
-                height: 18px;
-
-                z-index: 5;
-                border-radius: 50%;
-
-                background: #8b5cf6;
-
-                box-shadow:
-                    0 0 0 7px rgba(139, 92, 246, 0.13);
-            }}
-
-            .title-copy {{
-                position: absolute;
-                top: 218px;
-                left: 76px;
-
-                z-index: 5;
-
-                color: #6425d0;
-                font-size: 45px;
-                font-weight: 850;
-                line-height: 1.26;
-                letter-spacing: 0.01em;
-            }}
-
-            .title-meta {{
-                position: absolute;
-                top: 407px;
-                left: 78px;
-
-                z-index: 5;
-
-                color: #7257b6;
-                font-size: 15px;
-                line-height: 1.7;
-            }}
-
-            .title-meta-row {{
-                display: flex;
-                align-items: center;
-                gap: 14px;
-            }}
-
-            .meta-ball {{
-                width: 38px;
-                height: 38px;
-                flex: 0 0 auto;
-
-                border-radius: 50%;
-
-                background:
-                    radial-gradient(
-                        circle at 30% 25%,
-                        #ffffff 0%,
-                        #d9c8fb 35%,
-                        #a57ce9 100%
-                    );
-
-                box-shadow:
-                    inset -7px -8px 14px rgba(77, 31, 155, 0.18),
-                    0 8px 18px rgba(109, 40, 217, 0.17);
-            }}
-
-            .title-date {{
-                margin-top: 7px;
-                margin-left: 52px;
-            }}
-        </style>
-    </head>
-
-    <body>
-        <div class="viewport">
-            <div class="stage">
-
-                <div class="title-small-orb"></div>
-
-                <div
-                    class="circle ball-a"
-                    style="
-                        width:460px;
-                        height:460px;
-                        right:-112px;
-                        bottom:-158px;
-                        --dxA:360px;
-                        --dyA:130px;
-                    "
-                ></div>
-
-                <div
-                    class="circle ball-b"
-                    style="
-                        width:285px;
-                        height:285px;
-                        right:235px;
-                        bottom:-24px;
-                        --dxB:-320px;
-                        --dyB:190px;
-                    "
-                ></div>
-
-                <div class="title-line"></div>
-                <div class="title-line-dot"></div>
-
-                <div
-                    class="title-copy textup"
-                    style="animation-delay:1.42s"
-                >
-                    {lines_html}
-                </div>
-
-                <div
-                    class="title-meta textup"
-                    style="animation-delay:1.72s"
-                >
-                    <div class="title-meta-row">
-                        <span class="meta-ball"></span>
-                        <span>{slide["reporter"]}</span>
-                    </div>
-
-                    <div class="title-date">
-                        {slide["date"]}
-                    </div>
-                </div>
-
-            </div>
+  function titleMarkup(s) {
+    return `
+      <div class="title-layout">
+        <div class="eyebrow">${escapeText(s.eyebrow)}</div>
+        <h1 class="main-title">${s.title}</h1>
+        <div class="meta">
+          <span>${escapeText(s.reporter)}</span>
+          <span>${escapeText(s.date)}</span>
         </div>
-    </body>
-    </html>
-    """
+      </div>`;
+  }
 
-
-# ============================================================
-# 目錄頁
-# ============================================================
-
-def render_toc(slide):
-    rows = []
-
-    for index, item in enumerate(slide["items"], start=1):
-        delay = 1.54 + (index - 1) * 0.12
-
-        rows.append(
-            f"""
-            <div
-                class="toc-row textup"
-                style="animation-delay:{delay:.2f}s"
-            >
-                <span class="toc-num">{index:02d}</span>
-                <span class="toc-text">{item}</span>
-            </div>
-            """
-        )
-
-    rows_html = "\n".join(rows)
-
-    return f"""
-    <!DOCTYPE html>
-    <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-
-        <style>
-            {BASE_CSS}
-
-            .toc-corner-ball {{
-                position: absolute;
-                top: 28px;
-                right: 72px;
-
-                width: 70px;
-                height: 70px;
-
-                z-index: 4;
-                border-radius: 50%;
-
-                background:
-                    radial-gradient(
-                        circle at 30% 25%,
-                        #ffffff 0%,
-                        #ded0fb 35%,
-                        #aa82ed 100%
-                    );
-
-                box-shadow:
-                    inset -10px -12px 20px rgba(75, 28, 160, 0.18),
-                    0 12px 24px rgba(109, 40, 217, 0.17);
-            }}
-
-            .toc-heading {{
-                position: absolute;
-                top: 284px;
-                left: 106px;
-
-                z-index: 6;
-
-                color: #6425d0;
-                font-size: 38px;
-                font-weight: 850;
-                letter-spacing: -0.02em;
-            }}
-
-            .toc-subheading {{
-                position: absolute;
-                top: 340px;
-                left: 109px;
-
-                z-index: 6;
-
-                color: rgba(84, 57, 145, 0.70);
-                font-size: 14px;
-                letter-spacing: 0.14em;
-            }}
-
-            .toc-panel {{
-                position: absolute;
-                top: 157px;
-                left: 535px;
-
-                width: 505px;
-                z-index: 6;
-            }}
-
-            .toc-row {{
-                display: flex;
-                align-items: baseline;
-                gap: 20px;
-
-                min-height: 64px;
-                padding: 17px 0 13px;
-
-                border-bottom:
-                    1px solid rgba(140, 100, 220, 0.16);
-            }}
-
-            .toc-num {{
-                width: 34px;
-
-                color: #9465ed;
-                font-size: 15px;
-                font-weight: 800;
-            }}
-
-            .toc-text {{
-                color: #4b3885;
-                font-size: 20px;
-                font-weight: 680;
-                letter-spacing: 0.01em;
-            }}
-        </style>
-    </head>
-
-    <body>
-        <div class="viewport">
-            <div class="stage">
-
-                <div class="toc-corner-ball"></div>
-
-                <div
-                    class="circle ball-a"
-                    style="
-                        width:420px;
-                        height:420px;
-                        left:-178px;
-                        top:118px;
-                        --dxA:-390px;
-                        --dyA:-110px;
-                    "
-                ></div>
-
-                <div
-                    class="circle ball-b"
-                    style="
-                        width:265px;
-                        height:265px;
-                        left:96px;
-                        top:350px;
-                        --dxB:-260px;
-                        --dyB:220px;
-                    "
-                ></div>
-
-                <div
-                    class="toc-heading textup"
-                    style="animation-delay:1.38s"
-                >
-                    {slide["heading"]}
-                </div>
-
-                <div
-                    class="toc-subheading textup"
-                    style="animation-delay:1.52s"
-                >
-                    {slide.get("subtitle", "")}
-                </div>
-
-                <div class="toc-panel">
-                    {rows_html}
-                </div>
-
-            </div>
+  function tocMarkup(s) {
+    const rows = s.items.map((item, i) => `
+      <div class="toc-row">
+        <span class="toc-num">${String(i + 1).padStart(2, '0')}</span>
+        <span class="toc-text">${escapeText(item)}</span>
+      </div>`).join('');
+    return `
+      <div class="toc-layout">
+        <div class="toc-heading">
+          <div class="eyebrow">${escapeText(s.eyebrow)}</div>
+          <h1>${escapeText(s.title)}</h1>
         </div>
-    </body>
-    </html>
-    """
+        <div class="toc-list">${rows}</div>
+      </div>`;
+  }
 
-
-# ============================================================
-# 章節內容頁
-# ============================================================
-
-def render_section(slide):
-    list_html = points_html(
-        slide["points"],
-        delay_base=1.72,
-        step=0.13,
-    )
-
-    return f"""
-    <!DOCTYPE html>
-    <html lang="ja">
-    <head>
-        <meta charset="UTF-8">
-
-        <style>
-            {BASE_CSS}
-
-            .section-corner-ball {{
-                position: absolute;
-                top: 25px;
-                right: 66px;
-
-                width: 62px;
-                height: 62px;
-
-                z-index: 5;
-                border-radius: 50%;
-
-                background:
-                    radial-gradient(
-                        circle at 30% 25%,
-                        #ffffff 0%,
-                        #dfd2fb 36%,
-                        #a982eb 100%
-                    );
-
-                box-shadow:
-                    inset -9px -11px 18px rgba(75, 28, 160, 0.18),
-                    0 11px 22px rgba(109, 40, 217, 0.17);
-            }}
-
-            .section-bottom-ball {{
-                position: absolute;
-                right: 152px;
-                bottom: 34px;
-
-                width: 34px;
-                height: 34px;
-
-                z-index: 5;
-                border-radius: 50%;
-
-                background:
-                    radial-gradient(
-                        circle at 30% 25%,
-                        #ffffff 0%,
-                        #d7c6f8 38%,
-                        #986be2 100%
-                    );
-
-                box-shadow:
-                    0 8px 18px rgba(109, 40, 217, 0.17);
-            }}
-
-            .section-number {{
-                position: absolute;
-                top: 250px;
-                left: 113px;
-
-                z-index: 7;
-
-                color: #ffffff;
-                font-size: 29px;
-                font-weight: 850;
-                letter-spacing: 0.09em;
-
-                text-shadow:
-                    0 2px 12px rgba(60, 20, 130, 0.24);
-            }}
-
-            .section-label {{
-                position: absolute;
-                top: 294px;
-                left: 115px;
-
-                z-index: 7;
-
-                color: rgba(255, 255, 255, 0.84);
-                font-size: 13px;
-                font-weight: 600;
-                letter-spacing: 0.17em;
-            }}
-
-            .section-title {{
-                position: absolute;
-                top: 230px;
-                left: 548px;
-
-                width: 520px;
-                z-index: 7;
-
-                color: #56369e;
-                font-size: 35px;
-                font-weight: 850;
-                line-height: 1.35;
-                letter-spacing: 0.01em;
-            }}
-
-            .title-underline {{
-                position: absolute;
-                top: 302px;
-                left: 550px;
-
-                width: 72px;
-                height: 4px;
-
-                z-index: 7;
-                border-radius: 10px;
-
-                background:
-                    linear-gradient(
-                        90deg,
-                        #8b5cf6,
-                        #c8aef4
-                    );
-
-                opacity: 0;
-
-                animation:
-                    lineGrow 0.65s
-                    cubic-bezier(.22, .9, .32, 1)
-                    1.62s forwards;
-            }}
-
-            @keyframes lineGrow {{
-                from {{
-                    width: 0;
-                    opacity: 0;
-                }}
-
-                to {{
-                    width: 72px;
-                    opacity: 1;
-                }}
-            }}
-
-            .section-points {{
-                position: absolute;
-                top: 335px;
-                left: 550px;
-
-                width: 530px;
-                z-index: 7;
-
-                margin: 0;
-                padding: 0;
-
-                list-style: none;
-            }}
-
-            .section-points li {{
-                position: relative;
-
-                margin-bottom: 13px;
-                padding-left: 20px;
-
-                color: #5b4a88;
-                font-size: 16px;
-                line-height: 1.65;
-            }}
-
-            .section-points li::before {{
-                content: "";
-
-                position: absolute;
-                top: 10px;
-                left: 0;
-
-                width: 7px;
-                height: 7px;
-
-                border-radius: 50%;
-
-                background: #9765eb;
-
-                box-shadow:
-                    0 0 0 5px rgba(151, 101, 235, 0.11);
-            }}
-        </style>
-    </head>
-
-    <body>
-        <div class="viewport">
-            <div class="stage">
-
-                <div class="section-corner-ball"></div>
-                <div class="section-bottom-ball"></div>
-
-                <div
-                    class="circle ball-a"
-                    style="
-                        width:440px;
-                        height:440px;
-                        left:-200px;
-                        top:102px;
-                        --dxA:-400px;
-                        --dyA:-100px;
-                    "
-                ></div>
-
-                <div
-                    class="circle ball-b"
-                    style="
-                        width:270px;
-                        height:270px;
-                        left:82px;
-                        top:345px;
-                        --dxB:-270px;
-                        --dyB:220px;
-                    "
-                ></div>
-
-                <div
-                    class="section-number textup"
-                    style="animation-delay:1.35s"
-                >
-                    {slide["num"]}
-                </div>
-
-                <div
-                    class="section-label textup"
-                    style="animation-delay:1.48s"
-                >
-                    SECTION
-                </div>
-
-                <div
-                    class="section-title textup"
-                    style="animation-delay:1.48s"
-                >
-                    {slide["title"]}
-                </div>
-
-                <div class="title-underline"></div>
-
-                <ul class="section-points">
-                    {list_html}
-                </ul>
-
-            </div>
+  function sectionMarkup(s) {
+    const points = s.points.map(point => `<li>${escapeText(point)}</li>`).join('');
+    return `
+      <div class="section-layout">
+        <div class="section-mark">
+          <div class="section-num">${escapeText(s.num)}</div>
+          <div class="section-label">SECTION</div>
         </div>
-    </body>
-    </html>
-    """
+        <div class="section-copy">
+          <h1>${escapeText(s.title)}</h1>
+          <div class="rule"></div>
+          <ul class="points">${points}</ul>
+        </div>
+      </div>`;
+  }
 
+  function markup(s) {
+    if (s.type === 'title') return titleMarkup(s);
+    if (s.type === 'toc') return tocMarkup(s);
+    return sectionMarkup(s);
+  }
 
-# ============================================================
-# 選擇 renderer
-# ============================================================
+  function drawHud() {
+    progress.innerHTML = slides.map((_, i) =>
+      `<span class="dot ${i === index ? 'active' : ''}"></span>`
+    ).join('');
+    counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+    nextHint.innerHTML = index === slides.length - 1 ? 'RESTART <span>↻</span>' : 'CLICK <span>→</span>';
+  }
 
-RENDERERS = {
-    "title": render_title,
-    "toc": render_toc,
-    "section": render_section,
-}
+  function showInitial() {
+    const s = slides[index];
+    setOrb(orbA, s.ball1);
+    setOrb(orbB, s.ball2);
+    content.innerHTML = markup(s);
+    content.classList.add('in');
+    drawHud();
+  }
 
+  function moveTo(nextIndex) {
+    if (busy || nextIndex === index) return;
+    busy = true;
 
-def render_slide_html(slide):
-    renderer = RENDERERS.get(slide["type"])
+    content.classList.remove('in');
+    content.classList.add('out');
 
-    if renderer is None:
-        return "<h1>Unsupported slide type</h1>"
+    const next = slides[nextIndex];
+    setTimeout(() => {
+      setOrb(orbA, next.ball1);
+      setOrb(orbB, next.ball2);
+    }, 120);
 
-    return renderer(slide)
+    setTimeout(() => {
+      index = nextIndex;
+      content.innerHTML = markup(slides[index]);
+      content.classList.remove('out');
+      void content.offsetWidth;
+      content.classList.add('in');
+      drawHud();
+      busy = false;
+    }, 1020);
+  }
 
+  function next() {
+    moveTo(index === slides.length - 1 ? 0 : index + 1);
+  }
 
-# ============================================================
-# Streamlit 外層樣式
-# ============================================================
+  function previous() {
+    moveTo(index === 0 ? slides.length - 1 : index - 1);
+  }
+
+  stage.addEventListener('click', event => {
+    const rect = stage.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.left = `${event.clientX - rect.left}px`;
+    ripple.style.top = `${event.clientY - rect.top}px`;
+    stage.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 700);
+    next();
+  });
+
+  window.addEventListener('keydown', event => {
+    if (['ArrowRight', ' ', 'Enter', 'PageDown'].includes(event.key)) {
+      event.preventDefault();
+      next();
+    }
+    if (['ArrowLeft', 'PageUp'].includes(event.key)) {
+      event.preventDefault();
+      previous();
+    }
+  });
+
+  showInitial();
+</script>
+</body>
+</html>
+""".replace("__SLIDES__", slides_json)
+
 
 st.markdown(
     """
     <style>
-        html,
-        body,
-        [data-testid="stAppViewContainer"] {
-            background:
-                linear-gradient(
-                    145deg,
-                    #0d1017 0%,
-                    #131420 100%
-                );
-        }
-
-        [data-testid="stHeader"] {
-            background: transparent;
-        }
-
-        [data-testid="stToolbar"] {
-            display: none;
-        }
-
-        .block-container {
-            max-width: 1220px;
-            padding-top: 1.2rem;
-            padding-bottom: 1.2rem;
-        }
-
-        div[data-testid="stHorizontalBlock"] {
-            align-items: center;
-        }
-
-        div[data-testid="stButton"] button {
-            min-height: 42px;
-
-            color: #eee7ff;
-            font-weight: 650;
-
-            border:
-                1px solid rgba(180, 145, 245, 0.28);
-            border-radius: 14px;
-
-            background:
-                rgba(117, 75, 190, 0.16);
-
-            transition:
-                transform 160ms ease,
-                border-color 160ms ease,
-                background 160ms ease;
-        }
-
-        div[data-testid="stButton"] button:hover {
-            border-color:
-                rgba(190, 155, 255, 0.65);
-
-            background:
-                rgba(137, 92, 220, 0.28);
-
-            transform: translateY(-1px);
-        }
-
-        div[data-testid="stButton"] button:disabled {
-            opacity: 0.28;
-        }
-
-        iframe {
-            border-radius: 28px;
-        }
+      html, body, [data-testid="stAppViewContainer"] {
+        background: linear-gradient(145deg, #0c0e16, #141323);
+      }
+      [data-testid="stHeader"], [data-testid="stToolbar"], footer { display: none; }
+      .block-container {
+        width: min(1220px, 96vw);
+        max-width: 1220px;
+        padding: 1.3rem 0 0;
+      }
+      iframe { display: block; border: 0; }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
 
-# ============================================================
-# 投影片狀態
-# ============================================================
-
-if "slide_idx" not in st.session_state:
-    st.session_state.slide_idx = 0
-
-
-slide_count = len(SLIDES)
-current_index = st.session_state.slide_idx
-
-
-# ============================================================
-# 上方控制列
-# ============================================================
-
-previous_column, counter_column, next_column = st.columns(
-    [1.25, 5.5, 1.25]
-)
-
-
-with previous_column:
-    previous_clicked = st.button(
-        "◀ 前へ",
-        use_container_width=True,
-        disabled=current_index == 0,
-    )
-
-    if previous_clicked:
-        st.session_state.slide_idx = max(
-            0,
-            current_index - 1,
-        )
-        st.rerun()
-
-
-with counter_column:
-    st.markdown(
-        f"""
-        <div style="
-            text-align:center;
-            color:#b69af0;
-            font-size:14px;
-            font-weight:700;
-            letter-spacing:.16em;
-        ">
-            {current_index + 1:02d} / {slide_count:02d}
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-with next_column:
-    next_clicked = st.button(
-        "次へ ▶",
-        use_container_width=True,
-        disabled=current_index == slide_count - 1,
-    )
-
-    if next_clicked:
-        st.session_state.slide_idx = min(
-            slide_count - 1,
-            current_index + 1,
-        )
-        st.rerun()
-
-
-# ============================================================
-# 顯示投影片
-# ============================================================
-
-current_slide = SLIDES[current_index]
-
 components.html(
-    render_slide_html(current_slide),
-    height=CANVAS_H + 12,
+    HTML,
+    height=720,
     scrolling=False,
 )
-
-
-# ============================================================
-# 下方頁碼按鈕
-# ============================================================
-
-dot_columns = st.columns(slide_count)
-
-for index, column in enumerate(dot_columns):
-    with column:
-        if index == current_index:
-            label = f"● {index + 1:02d}"
-        else:
-            label = f"○ {index + 1:02d}"
-
-        dot_clicked = st.button(
-            label,
-            key=f"slide_dot_{index}",
-            use_container_width=True,
-        )
-
-        if dot_clicked:
-            st.session_state.slide_idx = index
-            st.rerun()

@@ -1,32 +1,35 @@
 # -*- coding: utf-8 -*-
 """
-データ基盤構築の考え方と業務自動化 — Streamlit プレゼンテーション
-------------------------------------------------------------------
-紫のバブル（円）モチーフのテンプレートを再現し、ページ遷移のたびに
-2つの円が動いてから文字が現れるアニメーションを実装しています。
-
-デプロイ方法:
-    1) requirements.txt の内容で依存関係をインストール
-       pip install -r requirements.txt
-    2) 実行
-       streamlit run app.py
-    3) Streamlit Community Cloud にそのまま push すればデプロイ可能です。
-
-内容を編集したい場合は、ファイル下部の `SLIDES` リストを書き換えてください。
+流動球體風格 Streamlit 簡報
 """
 
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="データ基盤構築の考え方と業務自動化", layout="wide")
 
-# ----------------------------------------------------------------------------
-# スライドの内容定義（ここを書き換えれば内容をカスタマイズできます）
-# ----------------------------------------------------------------------------
+# ============================================================
+# Streamlit 基本設定
+# ============================================================
+
+st.set_page_config(
+    page_title="データ基盤構築の考え方と業務自動化",
+    page_icon="🟣",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+
+
+# ============================================================
+# 投影片內容
+# ============================================================
+
 SLIDES = [
     {
         "type": "title",
-        "title_lines": ["データ基盤構築の考え方と", "業務自動化"],
+        "title_lines": [
+            "データ基盤構築の考え方と",
+            "業務自動化",
+        ],
         "reporter": "Reporter: XXX",
         "date": "XX.XX.XX",
     },
@@ -102,235 +105,1189 @@ SLIDES = [
     },
 ]
 
+
 CANVAS_W = 1160
 CANVAS_H = 653
 
-# ----------------------------------------------------------------------------
-# 共通スタイル
-# ----------------------------------------------------------------------------
+
+# ============================================================
+# 共用 CSS
+# ============================================================
+
 BASE_CSS = f"""
-* {{ box-sizing: border-box; }}
-html, body {{ margin:0; padding:0; background: transparent; }}
+* {{
+    box-sizing: border-box;
+}}
+
+html,
+body {{
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+}}
+
+.viewport {{
+    position: relative;
+    width: 100%;
+    height: {CANVAS_H}px;
+    overflow: hidden;
+}}
+
 .stage {{
-  position: relative;
-  width: {CANVAS_W}px;
-  height: {CANVAS_H}px;
-  margin: 0 auto;
-  background: linear-gradient(155deg, #fbf9fe 0%, #f6f1fc 55%, #f1e9fb 100%);
-  border-radius: 28px;
-  overflow: hidden;
-  box-shadow: 0 18px 46px rgba(109, 40, 217, 0.14);
-  font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: {CANVAS_W}px;
+    height: {CANVAS_H}px;
+
+    transform-origin: top center;
+    transform: translateX(-50%);
+
+    overflow: hidden;
+    border-radius: 28px;
+
+    background:
+        radial-gradient(
+            circle at 88% 12%,
+            rgba(221, 205, 255, 0.32) 0%,
+            transparent 30%
+        ),
+        linear-gradient(
+            145deg,
+            #fcfaff 0%,
+            #f7f2fd 52%,
+            #f1e8fc 100%
+        );
+
+    box-shadow:
+        0 18px 55px rgba(54, 28, 100, 0.16);
+
+    font-family:
+        "Noto Sans JP",
+        "Hiragino Kaku Gothic ProN",
+        "Yu Gothic",
+        "Microsoft JhengHei",
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
 }}
-.circle {{
-  position: absolute;
-  border-radius: 50%;
-  will-change: transform, opacity;
-  animation-fill-mode: forwards;
-  animation-timing-function: cubic-bezier(.22,.9,.32,1);
-}}
-.ball-a {{
-  background: radial-gradient(circle at 32% 30%, #c9b7f7 0%, #9b6ff0 55%, #7c4fe0 100%);
-  opacity: 0.9;
-  animation-name: ballInA;
-  animation-duration: 1000ms;
-}}
+
+
+/* ------------------------------------------------------------
+   球體共用樣式
+------------------------------------------------------------ */
+
+.circle,
+.ball-a,
 .ball-b {{
-  background: radial-gradient(circle at 35% 32%, #e4d7fb 0%, #b79af2 60%, #9b6ff0 100%);
-  opacity: 0.55;
-  animation-name: ballInB;
-  animation-duration: 1150ms;
-  animation-delay: 80ms;
+    position: absolute;
+    display: block;
+    border-radius: 50%;
+    overflow: hidden;
+
+    will-change: transform, opacity;
+    animation-fill-mode: forwards;
+    animation-timing-function: cubic-bezier(.22, .9, .32, 1);
 }}
+
+
+/* 主球 */
+
+.ball-a {{
+    z-index: 1;
+
+    background:
+        radial-gradient(
+            circle at 29% 24%,
+            rgba(255, 255, 255, 0.92) 0%,
+            rgba(224, 209, 255, 0.88) 13%,
+            rgba(183, 148, 247, 0.95) 36%,
+            rgba(139, 92, 246, 0.98) 67%,
+            rgba(94, 45, 190, 1) 100%
+        );
+
+    box-shadow:
+        inset -40px -46px 70px rgba(54, 17, 130, 0.34),
+        inset 26px 24px 48px rgba(255, 255, 255, 0.30),
+        0 32px 65px rgba(109, 40, 217, 0.25);
+
+    animation-name: ballInA;
+    animation-duration: 1.20s;
+}}
+
+
+/* 副球 */
+
+.ball-b {{
+    z-index: 2;
+
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            rgba(255, 255, 255, 0.96) 0%,
+            rgba(235, 225, 255, 0.92) 16%,
+            rgba(200, 174, 250, 0.90) 42%,
+            rgba(166, 122, 239, 0.92) 72%,
+            rgba(121, 75, 211, 0.96) 100%
+        );
+
+    box-shadow:
+        inset -28px -34px 54px rgba(71, 31, 150, 0.24),
+        inset 20px 18px 38px rgba(255, 255, 255, 0.36),
+        0 24px 48px rgba(109, 40, 217, 0.20);
+
+    animation-name: ballInB;
+    animation-duration: 1.32s;
+    animation-delay: 0.08s;
+}}
+
+
+/* 球體表面的光點 */
+
+.ball-a::after,
+.ball-b::after {{
+    content: "";
+    position: absolute;
+
+    top: 12%;
+    left: 17%;
+
+    width: 27%;
+    height: 18%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(255, 255, 255, 0.66) 0%,
+            rgba(255, 255, 255, 0.18) 45%,
+            transparent 72%
+        );
+
+    transform: rotate(-25deg);
+    filter: blur(2px);
+}}
+
+
+/* ------------------------------------------------------------
+   球體移動
+------------------------------------------------------------ */
+
 @keyframes ballInA {{
-  0%   {{ transform: translate(var(--dxA), var(--dyA)) scale(0.55); opacity: 0; }}
-  62%  {{ transform: translate(calc(var(--dxA) * 0.12), calc(var(--dyA) * 0.12)) scale(1.05); opacity: 0.9; }}
-  100% {{ transform: translate(0,0) scale(1); opacity: 0.9; }}
+    0% {{
+        transform:
+            translate(var(--dxA), var(--dyA))
+            scale(0.30)
+            rotate(-14deg);
+
+        opacity: 0;
+    }}
+
+    58% {{
+        opacity: 0.95;
+    }}
+
+    74% {{
+        transform:
+            translate(-18px, 10px)
+            scale(1.07)
+            rotate(3deg);
+
+        opacity: 0.95;
+    }}
+
+    88% {{
+        transform:
+            translate(7px, -4px)
+            scale(0.98)
+            rotate(-1deg);
+    }}
+
+    100% {{
+        transform:
+            translate(0, 0)
+            scale(1)
+            rotate(0);
+
+        opacity: 0.95;
+    }}
 }}
+
+
 @keyframes ballInB {{
-  0%   {{ transform: translate(var(--dxB), var(--dyB)) scale(0.55); opacity: 0; }}
-  62%  {{ transform: translate(calc(var(--dxB) * 0.12), calc(var(--dyB) * 0.12)) scale(1.05); opacity: 0.55; }}
-  100% {{ transform: translate(0,0) scale(1); opacity: 0.55; }}
+    0% {{
+        transform:
+            translate(var(--dxB), var(--dyB))
+            scale(0.24)
+            rotate(18deg);
+
+        opacity: 0;
+    }}
+
+    58% {{
+        opacity: 0.72;
+    }}
+
+    72% {{
+        transform:
+            translate(15px, -9px)
+            scale(1.09)
+            rotate(-4deg);
+
+        opacity: 0.72;
+    }}
+
+    88% {{
+        transform:
+            translate(-5px, 4px)
+            scale(0.97)
+            rotate(1deg);
+    }}
+
+    100% {{
+        transform:
+            translate(0, 0)
+            scale(1)
+            rotate(0);
+
+        opacity: 0.72;
+    }}
 }}
+
+
+/* ------------------------------------------------------------
+   文字動畫：等球體移動後再出現
+------------------------------------------------------------ */
+
 .textup {{
-  opacity: 0;
-  transform: translateY(20px);
-  animation: textIn 650ms cubic-bezier(.22,.9,.32,1) forwards;
+    opacity: 0;
+    transform: translateY(24px);
+
+    animation-name: textIn;
+    animation-duration: 0.68s;
+    animation-timing-function: cubic-bezier(.22, .9, .32, 1);
+    animation-fill-mode: forwards;
 }}
+
 @keyframes textIn {{
-  to {{ opacity: 1; transform: translateY(0); }}
+    0% {{
+        opacity: 0;
+        transform: translateY(24px);
+        filter: blur(4px);
+    }}
+
+    100% {{
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }}
 }}
+
+
 .pagefoot {{
-  position:absolute; bottom:22px; right:34px;
-  font-size:12px; letter-spacing:.08em; color:#a48fe0;
-  opacity:0; animation: textIn 500ms ease forwards; animation-delay: 1.05s;
+    position: absolute;
+    right: 34px;
+    bottom: 22px;
+
+    z-index: 5;
+
+    color: #9c87d9;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+
+    opacity: 0;
+
+    animation: textIn 0.55s ease 1.85s forwards;
 }}
+
+
+/* ------------------------------------------------------------
+   窄螢幕自動縮放
+------------------------------------------------------------ */
+
+@media (max-width: 1160px) {{
+    .stage {{
+        left: 0;
+        transform: scale(calc(100vw / {CANVAS_W}));
+        transform-origin: top left;
+    }}
+
+    .viewport {{
+        height: calc({CANVAS_H}px * (100vw / {CANVAS_W}));
+    }}
+}}
+
+
+/* 使用者關閉動畫時 */
+
 @media (prefers-reduced-motion: reduce) {{
-  .circle, .textup, .pagefoot {{ animation: none !important; opacity: 1 !important; transform:none !important; }}
+    .circle,
+    .ball-a,
+    .ball-b,
+    .textup,
+    .pagefoot {{
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+    }}
 }}
 """
 
-def _points_html(points, delay_base=0.85, step=0.1):
-    lis = []
-    for i, p in enumerate(points):
-        d = delay_base + i * step
-        lis.append(
-            f'<li class="textup" style="animation-delay:{d:.2f}s">{p}</li>'
-        )
-    return "\n".join(lis)
 
+# ============================================================
+# HTML 輔助函式
+# ============================================================
+
+def points_html(points, delay_base=1.72, step=0.13):
+    result = []
+
+    for index, point in enumerate(points):
+        delay = delay_base + index * step
+
+        result.append(
+            f"""
+            <li
+                class="textup"
+                style="animation-delay:{delay:.2f}s"
+            >
+                {point}
+            </li>
+            """
+        )
+
+    return "\n".join(result)
+
+
+# ============================================================
+# 首頁
+# ============================================================
 
 def render_title(slide):
-    lines_html = "".join(f"<div>{ln}</div>" for ln in slide["title_lines"])
-    html = f"""
-    <style>{BASE_CSS}
-      .t-badge {{ position:absolute; top:0; left:0; width:180px; height:180px;
-        background: radial-gradient(circle at 65% 65%, #d9c8fb 0%, #efe6fb 70%, transparent 100%);
-        border-radius: 0 0 100% 0; opacity:.8; }}
-      .t-title {{ position:absolute; left:70px; top:225px; font-size:44px; font-weight:800;
-        color:#6d28d9; line-height:1.25; letter-spacing:.01em; }}
-      .t-sub {{ position:absolute; left:70px; top:398px; font-size:15px; color:#7c5fc4; }}
-      .t-sub .dot {{ display:inline-block; width:34px; height:34px; border-radius:50%;
-        background: radial-gradient(circle at 35% 30%, #e4d7fb, #b79af2); margin-right:12px; vertical-align:middle; }}
-      .t-line {{ position:absolute; right:60px; top:96px; width:2px; height:410px; background:#c8b3f5; opacity:.8; }}
-      .t-dot {{ position:absolute; right:52px; top:88px; width:18px; height:18px; border-radius:50%; background:#8b5cf6; }}
-    </style>
-    <div class="stage">
-      <div class="t-badge"></div>
-      <div class="ball-a" style="width:460px;height:460px; right:-140px; bottom:-150px;
-           --dxA:180px; --dyA:120px;"></div>
-      <div class="ball-b" style="width:300px;height:300px; right:200px; bottom:-40px;
-           --dxB:-140px; --dyB:160px;"></div>
-      <div class="t-line"></div>
-      <div class="t-dot"></div>
-      <div class="t-title textup" style="animation-delay:.6s">{lines_html}</div>
-      <div class="t-sub textup" style="animation-delay:.85s">
-        <span class="dot"></span>{slide['reporter']}<br/><span style="margin-left:46px; display:inline-block; margin-top:6px;">{slide['date']}</span>
-      </div>
-    </div>
-    """
-    return html
+    lines_html = "".join(
+        f"<div>{line}</div>"
+        for line in slide["title_lines"]
+    )
 
+    return f"""
+    <!DOCTYPE html>
+    <html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            {BASE_CSS}
+
+            .title-small-orb {{
+                position: absolute;
+                top: -80px;
+                left: -75px;
+
+                width: 235px;
+                height: 235px;
+
+                z-index: 0;
+                border-radius: 50%;
+
+                background:
+                    radial-gradient(
+                        circle at 62% 64%,
+                        #d4bdfa 0%,
+                        #eee5fc 63%,
+                        rgba(255,255,255,0) 72%
+                    );
+
+                opacity: 0.78;
+            }}
+
+            .title-line {{
+                position: absolute;
+                top: 90px;
+                right: 74px;
+
+                width: 2px;
+                height: 410px;
+
+                z-index: 4;
+
+                background:
+                    linear-gradient(
+                        to bottom,
+                        #8b5cf6,
+                        rgba(200, 179, 245, 0.30)
+                    );
+            }}
+
+            .title-line-dot {{
+                position: absolute;
+                top: 81px;
+                right: 66px;
+
+                width: 18px;
+                height: 18px;
+
+                z-index: 5;
+                border-radius: 50%;
+
+                background: #8b5cf6;
+
+                box-shadow:
+                    0 0 0 7px rgba(139, 92, 246, 0.13);
+            }}
+
+            .title-copy {{
+                position: absolute;
+                top: 218px;
+                left: 76px;
+
+                z-index: 5;
+
+                color: #6425d0;
+                font-size: 45px;
+                font-weight: 850;
+                line-height: 1.26;
+                letter-spacing: 0.01em;
+            }}
+
+            .title-meta {{
+                position: absolute;
+                top: 407px;
+                left: 78px;
+
+                z-index: 5;
+
+                color: #7257b6;
+                font-size: 15px;
+                line-height: 1.7;
+            }}
+
+            .title-meta-row {{
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }}
+
+            .meta-ball {{
+                width: 38px;
+                height: 38px;
+                flex: 0 0 auto;
+
+                border-radius: 50%;
+
+                background:
+                    radial-gradient(
+                        circle at 30% 25%,
+                        #ffffff 0%,
+                        #d9c8fb 35%,
+                        #a57ce9 100%
+                    );
+
+                box-shadow:
+                    inset -7px -8px 14px rgba(77, 31, 155, 0.18),
+                    0 8px 18px rgba(109, 40, 217, 0.17);
+            }}
+
+            .title-date {{
+                margin-top: 7px;
+                margin-left: 52px;
+            }}
+        </style>
+    </head>
+
+    <body>
+        <div class="viewport">
+            <div class="stage">
+
+                <div class="title-small-orb"></div>
+
+                <div
+                    class="circle ball-a"
+                    style="
+                        width:460px;
+                        height:460px;
+                        right:-112px;
+                        bottom:-158px;
+                        --dxA:360px;
+                        --dyA:130px;
+                    "
+                ></div>
+
+                <div
+                    class="circle ball-b"
+                    style="
+                        width:285px;
+                        height:285px;
+                        right:235px;
+                        bottom:-24px;
+                        --dxB:-320px;
+                        --dyB:190px;
+                    "
+                ></div>
+
+                <div class="title-line"></div>
+                <div class="title-line-dot"></div>
+
+                <div
+                    class="title-copy textup"
+                    style="animation-delay:1.42s"
+                >
+                    {lines_html}
+                </div>
+
+                <div
+                    class="title-meta textup"
+                    style="animation-delay:1.72s"
+                >
+                    <div class="title-meta-row">
+                        <span class="meta-ball"></span>
+                        <span>{slide["reporter"]}</span>
+                    </div>
+
+                    <div class="title-date">
+                        {slide["date"]}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+
+# ============================================================
+# 目錄頁
+# ============================================================
 
 def render_toc(slide):
-    items_html = []
-    for i, item in enumerate(slide["items"], start=1):
-        d = 0.9 + (i - 1) * 0.1
-        items_html.append(f"""
-        <div class="toc-row textup" style="animation-delay:{d:.2f}s">
-          <span class="toc-num">{i:02d}</span><span class="toc-txt">{item}</span>
-        </div>""")
-    items_html = "\n".join(items_html)
-    html = f"""
-    <style>{BASE_CSS}
-      .c-corner {{ position:absolute; width:70px; height:70px; border-radius:50%;
-        background: radial-gradient(circle at 35% 32%, #e4d7fb, #b79af2); opacity:.7; }}
-      .c-heading {{ position:absolute; left:96px; top:296px; font-size:36px; font-weight:800; color:#6d28d9; }}
-      .toc-panel {{ position:absolute; left:520px; top:190px; width:520px; }}
-      .toc-row {{ display:flex; align-items:baseline; gap:18px; padding:14px 0; border-bottom:1px solid rgba(140,100,220,.14); }}
-      .toc-num {{ font-size:15px; font-weight:700; color:#9b6ff0; width:28px; }}
-      .toc-txt {{ font-size:19px; font-weight:600; color:#4c3a86; }}
-    </style>
-    <div class="stage">
-      <div class="c-corner" style="top:26px; right:70px;"></div>
-      <div class="ball-a" style="width:400px;height:400px; left:-160px; top:130px;
-           --dxA:-180px; --dyA:-60px;"></div>
-      <div class="ball-b" style="width:260px;height:260px; left:60px; top:340px;
-           --dxB:-140px; --dyB:140px;"></div>
-      <div class="c-heading textup" style="animation-delay:.62s">{slide['heading']}</div>
-      <div class="toc-panel">{items_html}</div>
-      <div class="pagefoot">{slide.get('subtitle','')}</div>
-    </div>
-    """
-    return html
+    rows = []
 
+    for index, item in enumerate(slide["items"], start=1):
+        delay = 1.54 + (index - 1) * 0.12
+
+        rows.append(
+            f"""
+            <div
+                class="toc-row textup"
+                style="animation-delay:{delay:.2f}s"
+            >
+                <span class="toc-num">{index:02d}</span>
+                <span class="toc-text">{item}</span>
+            </div>
+            """
+        )
+
+    rows_html = "\n".join(rows)
+
+    return f"""
+    <!DOCTYPE html>
+    <html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+
+        <style>
+            {BASE_CSS}
+
+            .toc-corner-ball {{
+                position: absolute;
+                top: 28px;
+                right: 72px;
+
+                width: 70px;
+                height: 70px;
+
+                z-index: 4;
+                border-radius: 50%;
+
+                background:
+                    radial-gradient(
+                        circle at 30% 25%,
+                        #ffffff 0%,
+                        #ded0fb 35%,
+                        #aa82ed 100%
+                    );
+
+                box-shadow:
+                    inset -10px -12px 20px rgba(75, 28, 160, 0.18),
+                    0 12px 24px rgba(109, 40, 217, 0.17);
+            }}
+
+            .toc-heading {{
+                position: absolute;
+                top: 284px;
+                left: 106px;
+
+                z-index: 6;
+
+                color: #6425d0;
+                font-size: 38px;
+                font-weight: 850;
+                letter-spacing: -0.02em;
+            }}
+
+            .toc-subheading {{
+                position: absolute;
+                top: 340px;
+                left: 109px;
+
+                z-index: 6;
+
+                color: rgba(84, 57, 145, 0.70);
+                font-size: 14px;
+                letter-spacing: 0.14em;
+            }}
+
+            .toc-panel {{
+                position: absolute;
+                top: 157px;
+                left: 535px;
+
+                width: 505px;
+                z-index: 6;
+            }}
+
+            .toc-row {{
+                display: flex;
+                align-items: baseline;
+                gap: 20px;
+
+                min-height: 64px;
+                padding: 17px 0 13px;
+
+                border-bottom:
+                    1px solid rgba(140, 100, 220, 0.16);
+            }}
+
+            .toc-num {{
+                width: 34px;
+
+                color: #9465ed;
+                font-size: 15px;
+                font-weight: 800;
+            }}
+
+            .toc-text {{
+                color: #4b3885;
+                font-size: 20px;
+                font-weight: 680;
+                letter-spacing: 0.01em;
+            }}
+        </style>
+    </head>
+
+    <body>
+        <div class="viewport">
+            <div class="stage">
+
+                <div class="toc-corner-ball"></div>
+
+                <div
+                    class="circle ball-a"
+                    style="
+                        width:420px;
+                        height:420px;
+                        left:-178px;
+                        top:118px;
+                        --dxA:-390px;
+                        --dyA:-110px;
+                    "
+                ></div>
+
+                <div
+                    class="circle ball-b"
+                    style="
+                        width:265px;
+                        height:265px;
+                        left:96px;
+                        top:350px;
+                        --dxB:-260px;
+                        --dyB:220px;
+                    "
+                ></div>
+
+                <div
+                    class="toc-heading textup"
+                    style="animation-delay:1.38s"
+                >
+                    {slide["heading"]}
+                </div>
+
+                <div
+                    class="toc-subheading textup"
+                    style="animation-delay:1.52s"
+                >
+                    {slide.get("subtitle", "")}
+                </div>
+
+                <div class="toc-panel">
+                    {rows_html}
+                </div>
+
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+
+# ============================================================
+# 章節內容頁
+# ============================================================
 
 def render_section(slide):
-    points_html = _points_html(slide["points"], delay_base=0.95, step=0.12)
-    html = f"""
-    <style>{BASE_CSS}
-      .s-corner {{ position:absolute; width:60px; height:60px; border-radius:50%;
-        background: radial-gradient(circle at 35% 32%, #e4d7fb, #b79af2); opacity:.65; }}
-      .s-num {{ position:absolute; left:118px; top:260px; font-size:26px; font-weight:800; color:#fff;
-        letter-spacing:.08em; z-index:3; }}
-      .s-num-label {{ position:absolute; left:118px; top:300px; font-size:15px; color:#efe6fb; z-index:3; }}
-      .s-title {{ position:absolute; left:560px; top:250px; font-size:34px; font-weight:800; color:#5b3aa8; width:520px; }}
-      .s-points {{ position:absolute; left:560px; top:330px; width:540px; list-style:none; margin:0; padding:0; }}
-      .s-points li {{ font-size:16px; color:#5c4a8a; line-height:1.7; margin-bottom:12px; padding-left:18px; position:relative; }}
-      .s-points li:before {{ content:""; position:absolute; left:0; top:9px; width:6px; height:6px; border-radius:50%; background:#9b6ff0; }}
-    </style>
-    <div class="stage">
-      <div class="s-corner" style="top:24px; right:64px;"></div>
-      <div class="s-corner" style="width:34px;height:34px; bottom:30px; right:150px;"></div>
-      <div class="ball-a" style="width:430px;height:430px; left:-190px; top:110px;
-           --dxA:-190px; --dyA:-90px;"></div>
-      <div class="ball-b" style="width:260px;height:260px; left:70px; top:330px;
-           --dxB:-120px; --dyB:150px;"></div>
-      <div class="s-num textup" style="animation-delay:.58s">{slide['num']}</div>
-      <div class="s-num-label textup" style="animation-delay:.7s">SECTION</div>
-      <div class="s-title textup" style="animation-delay:.68s">{slide['title']}</div>
-      <ul class="s-points">{points_html}</ul>
-    </div>
+    list_html = points_html(
+        slide["points"],
+        delay_base=1.72,
+        step=0.13,
+    )
+
+    return f"""
+    <!DOCTYPE html>
+    <html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+
+        <style>
+            {BASE_CSS}
+
+            .section-corner-ball {{
+                position: absolute;
+                top: 25px;
+                right: 66px;
+
+                width: 62px;
+                height: 62px;
+
+                z-index: 5;
+                border-radius: 50%;
+
+                background:
+                    radial-gradient(
+                        circle at 30% 25%,
+                        #ffffff 0%,
+                        #dfd2fb 36%,
+                        #a982eb 100%
+                    );
+
+                box-shadow:
+                    inset -9px -11px 18px rgba(75, 28, 160, 0.18),
+                    0 11px 22px rgba(109, 40, 217, 0.17);
+            }}
+
+            .section-bottom-ball {{
+                position: absolute;
+                right: 152px;
+                bottom: 34px;
+
+                width: 34px;
+                height: 34px;
+
+                z-index: 5;
+                border-radius: 50%;
+
+                background:
+                    radial-gradient(
+                        circle at 30% 25%,
+                        #ffffff 0%,
+                        #d7c6f8 38%,
+                        #986be2 100%
+                    );
+
+                box-shadow:
+                    0 8px 18px rgba(109, 40, 217, 0.17);
+            }}
+
+            .section-number {{
+                position: absolute;
+                top: 250px;
+                left: 113px;
+
+                z-index: 7;
+
+                color: #ffffff;
+                font-size: 29px;
+                font-weight: 850;
+                letter-spacing: 0.09em;
+
+                text-shadow:
+                    0 2px 12px rgba(60, 20, 130, 0.24);
+            }}
+
+            .section-label {{
+                position: absolute;
+                top: 294px;
+                left: 115px;
+
+                z-index: 7;
+
+                color: rgba(255, 255, 255, 0.84);
+                font-size: 13px;
+                font-weight: 600;
+                letter-spacing: 0.17em;
+            }}
+
+            .section-title {{
+                position: absolute;
+                top: 230px;
+                left: 548px;
+
+                width: 520px;
+                z-index: 7;
+
+                color: #56369e;
+                font-size: 35px;
+                font-weight: 850;
+                line-height: 1.35;
+                letter-spacing: 0.01em;
+            }}
+
+            .title-underline {{
+                position: absolute;
+                top: 302px;
+                left: 550px;
+
+                width: 72px;
+                height: 4px;
+
+                z-index: 7;
+                border-radius: 10px;
+
+                background:
+                    linear-gradient(
+                        90deg,
+                        #8b5cf6,
+                        #c8aef4
+                    );
+
+                opacity: 0;
+
+                animation:
+                    lineGrow 0.65s
+                    cubic-bezier(.22, .9, .32, 1)
+                    1.62s forwards;
+            }}
+
+            @keyframes lineGrow {{
+                from {{
+                    width: 0;
+                    opacity: 0;
+                }}
+
+                to {{
+                    width: 72px;
+                    opacity: 1;
+                }}
+            }}
+
+            .section-points {{
+                position: absolute;
+                top: 335px;
+                left: 550px;
+
+                width: 530px;
+                z-index: 7;
+
+                margin: 0;
+                padding: 0;
+
+                list-style: none;
+            }}
+
+            .section-points li {{
+                position: relative;
+
+                margin-bottom: 13px;
+                padding-left: 20px;
+
+                color: #5b4a88;
+                font-size: 16px;
+                line-height: 1.65;
+            }}
+
+            .section-points li::before {{
+                content: "";
+
+                position: absolute;
+                top: 10px;
+                left: 0;
+
+                width: 7px;
+                height: 7px;
+
+                border-radius: 50%;
+
+                background: #9765eb;
+
+                box-shadow:
+                    0 0 0 5px rgba(151, 101, 235, 0.11);
+            }}
+        </style>
+    </head>
+
+    <body>
+        <div class="viewport">
+            <div class="stage">
+
+                <div class="section-corner-ball"></div>
+                <div class="section-bottom-ball"></div>
+
+                <div
+                    class="circle ball-a"
+                    style="
+                        width:440px;
+                        height:440px;
+                        left:-200px;
+                        top:102px;
+                        --dxA:-400px;
+                        --dyA:-100px;
+                    "
+                ></div>
+
+                <div
+                    class="circle ball-b"
+                    style="
+                        width:270px;
+                        height:270px;
+                        left:82px;
+                        top:345px;
+                        --dxB:-270px;
+                        --dyB:220px;
+                    "
+                ></div>
+
+                <div
+                    class="section-number textup"
+                    style="animation-delay:1.35s"
+                >
+                    {slide["num"]}
+                </div>
+
+                <div
+                    class="section-label textup"
+                    style="animation-delay:1.48s"
+                >
+                    SECTION
+                </div>
+
+                <div
+                    class="section-title textup"
+                    style="animation-delay:1.48s"
+                >
+                    {slide["title"]}
+                </div>
+
+                <div class="title-underline"></div>
+
+                <ul class="section-points">
+                    {list_html}
+                </ul>
+
+            </div>
+        </div>
+    </body>
+    </html>
     """
-    return html
 
 
-RENDERERS = {"title": render_title, "toc": render_toc, "section": render_section}
+# ============================================================
+# 選擇 renderer
+# ============================================================
+
+RENDERERS = {
+    "title": render_title,
+    "toc": render_toc,
+    "section": render_section,
+}
 
 
 def render_slide_html(slide):
-    return RENDERERS[slide["type"]](slide)
+    renderer = RENDERERS.get(slide["type"])
+
+    if renderer is None:
+        return "<h1>Unsupported slide type</h1>"
+
+    return renderer(slide)
 
 
-# ----------------------------------------------------------------------------
-# Streamlit アプリ本体
-# ----------------------------------------------------------------------------
+# ============================================================
+# Streamlit 外層樣式
+# ============================================================
+
 st.markdown(
     """
     <style>
-      .block-container {padding-top: 2rem; padding-bottom: 1rem; max-width: 1220px;}
-      div[data-testid="stHorizontalBlock"] {align-items:center;}
+        html,
+        body,
+        [data-testid="stAppViewContainer"] {
+            background:
+                linear-gradient(
+                    145deg,
+                    #0d1017 0%,
+                    #131420 100%
+                );
+        }
+
+        [data-testid="stHeader"] {
+            background: transparent;
+        }
+
+        [data-testid="stToolbar"] {
+            display: none;
+        }
+
+        .block-container {
+            max-width: 1220px;
+            padding-top: 1.2rem;
+            padding-bottom: 1.2rem;
+        }
+
+        div[data-testid="stHorizontalBlock"] {
+            align-items: center;
+        }
+
+        div[data-testid="stButton"] button {
+            min-height: 42px;
+
+            color: #eee7ff;
+            font-weight: 650;
+
+            border:
+                1px solid rgba(180, 145, 245, 0.28);
+            border-radius: 14px;
+
+            background:
+                rgba(117, 75, 190, 0.16);
+
+            transition:
+                transform 160ms ease,
+                border-color 160ms ease,
+                background 160ms ease;
+        }
+
+        div[data-testid="stButton"] button:hover {
+            border-color:
+                rgba(190, 155, 255, 0.65);
+
+            background:
+                rgba(137, 92, 220, 0.28);
+
+            transform: translateY(-1px);
+        }
+
+        div[data-testid="stButton"] button:disabled {
+            opacity: 0.28;
+        }
+
+        iframe {
+            border-radius: 28px;
+        }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
+
+# ============================================================
+# 投影片狀態
+# ============================================================
+
 if "slide_idx" not in st.session_state:
     st.session_state.slide_idx = 0
 
-n = len(SLIDES)
-idx = st.session_state.slide_idx
 
-col_prev, col_mid, col_next = st.columns([1, 6, 1])
-with col_prev:
-    if st.button("◀ 前へ", use_container_width=True, disabled=(idx == 0)):
-        st.session_state.slide_idx = max(0, idx - 1)
+slide_count = len(SLIDES)
+current_index = st.session_state.slide_idx
+
+
+# ============================================================
+# 上方控制列
+# ============================================================
+
+previous_column, counter_column, next_column = st.columns(
+    [1.25, 5.5, 1.25]
+)
+
+
+with previous_column:
+    previous_clicked = st.button(
+        "◀ 前へ",
+        use_container_width=True,
+        disabled=current_index == 0,
+    )
+
+    if previous_clicked:
+        st.session_state.slide_idx = max(
+            0,
+            current_index - 1,
+        )
         st.rerun()
-with col_next:
-    if st.button("次へ ▶", use_container_width=True, disabled=(idx == n - 1)):
-        st.session_state.slide_idx = min(n - 1, idx + 1)
-        st.rerun()
-with col_mid:
+
+
+with counter_column:
     st.markdown(
-        f"<div style='text-align:center;color:#8b5cf6;font-weight:600;'>"
-        f"{idx + 1} / {n}</div>",
+        f"""
+        <div style="
+            text-align:center;
+            color:#b69af0;
+            font-size:14px;
+            font-weight:700;
+            letter-spacing:.16em;
+        ">
+            {current_index + 1:02d} / {slide_count:02d}
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
-current = SLIDES[idx]
-# key を slide_idx に紐づけることで、切り替えるたびにコンポーネントが
-# 再マウントされ、円と文字のアニメーションが毎回再生されます。
+
+with next_column:
+    next_clicked = st.button(
+        "次へ ▶",
+        use_container_width=True,
+        disabled=current_index == slide_count - 1,
+    )
+
+    if next_clicked:
+        st.session_state.slide_idx = min(
+            slide_count - 1,
+            current_index + 1,
+        )
+        st.rerun()
+
+
+# ============================================================
+# 顯示投影片
+# ============================================================
+
+current_slide = SLIDES[current_index]
+
 components.html(
-    render_slide_html(current),
-    height=CANVAS_H + 20,
+    render_slide_html(current_slide),
+    height=CANVAS_H + 12,
     scrolling=False,
 )
 
-# ページ移動用のドット（クリックでジャンプ）
-dot_cols = st.columns(n)
-for i, c in enumerate(dot_cols):
-    with c:
-        label = "●" if i == idx else "○"
-        if st.button(label, key=f"dot_{i}", use_container_width=True):
-            st.session_state.slide_idx = i
+
+# ============================================================
+# 下方頁碼按鈕
+# ============================================================
+
+dot_columns = st.columns(slide_count)
+
+for index, column in enumerate(dot_columns):
+    with column:
+        if index == current_index:
+            label = f"● {index + 1:02d}"
+        else:
+            label = f"○ {index + 1:02d}"
+
+        dot_clicked = st.button(
+            label,
+            key=f"slide_dot_{index}",
+            use_container_width=True,
+        )
+
+        if dot_clicked:
+            st.session_state.slide_idx = index
             st.rerun()

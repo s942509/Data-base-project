@@ -366,31 +366,29 @@ HTML = r"""
   }
   .pipeline-title {
     position: absolute;
-    left: 5.5%;
+    left: 5.3%;
     top: 5.8%;
     margin: 0;
     color: #402b3b;
-    font-size: clamp(24px, 3.25vw, 44px);
+    font-size: clamp(22px, 2.85vw, 39px);
     font-weight: 900;
     letter-spacing: .015em;
   }
   .pipeline-flow {
     position: absolute;
-    left: 4%;
-    right: 4%;
-    top: 18%;
-    height: 62%;
-    display: grid;
-    grid-template-columns: 18% 8% 24% 15% 7% 28%;
-    align-items: center;
+    inset: 0;
   }
   .pipeline-source {
-    align-self: stretch;
-    padding-top: 4%;
+    position: absolute;
+    left: 4.9%;
+    top: 18.8%;
+    width: 12%;
+    height: 29%;
   }
   .pipeline-label {
     display: inline-flex;
     align-items: center;
+    width: 89%;
     min-height: 35px;
     padding: 7px 13px;
     color: white;
@@ -402,8 +400,8 @@ HTML = r"""
   .source-stack {
     position: relative;
     display: grid;
-    gap: 24%;
-    margin-top: 21%;
+    gap: 22%;
+    margin-top: 45%;
   }
   .source-stack::after {
     content: "";
@@ -420,13 +418,12 @@ HTML = r"""
     border: 1.5px solid #ef7b42;
     background: linear-gradient(135deg, rgba(255,220,206,.82), rgba(250,177,148,.78));
     color: #49343d;
-    font-size: clamp(10px, 1.15vw, 16px);
+    font-size: clamp(10px, 1.05vw, 15px);
   }
   .flow-arrow {
-    position: relative;
-    width: 72%;
+    position: absolute;
+    width: 5%;
     height: 20px;
-    justify-self: center;
     background: linear-gradient(90deg, #d94768, #ee5b76);
     filter: drop-shadow(0 2px 2px rgba(85,28,57,.15));
   }
@@ -440,8 +437,15 @@ HTML = r"""
     border-bottom: 20px solid transparent;
     border-left: 20px solid #ee5b76;
   }
+  .arrow-one { left: 22.4%; top: 34.5%; }
+  .arrow-two { left: 66.5%; top: 36%; background: linear-gradient(90deg, #9d658b, #ab7199); }
+  .arrow-two::after { border-left-color: #ab7199; }
   .pipeline-products {
-    align-self: stretch;
+    position: absolute;
+    left: 35%;
+    top: 18.4%;
+    width: 17.3%;
+    height: 41.2%;
     padding: 3% 8% 5%;
     border: 2px solid #44a82e;
     background: rgba(255,255,255,.16);
@@ -455,8 +459,10 @@ HTML = r"""
     line-height: 1.15;
   }
   .pipeline-note {
-    position: relative;
-    justify-self: center;
+    position: absolute;
+    left: 54.6%;
+    top: 35.2%;
+    width: 10%;
     color: #573b4b;
     font-size: clamp(10px, 1.05vw, 15px);
     line-height: 1.45;
@@ -474,11 +480,15 @@ HTML = r"""
   .pipeline-note::before { top: 38%; transform: rotate(-23deg); }
   .pipeline-note::after { top: 60%; transform: rotate(-8deg); }
   .pipeline-result {
-    align-self: stretch;
+    position: absolute;
+    left: 75.8%;
+    top: 17.1%;
+    width: 19.1%;
+    height: 35%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 1%;
+    padding-top: 0;
   }
   .result-label {
     width: 100%;
@@ -491,18 +501,18 @@ HTML = r"""
   }
   .result-image {
     display: block;
-    width: 88%;
-    height: 69%;
-    margin-top: 6%;
+    width: 100%;
+    height: 75%;
+    margin-top: 7%;
     object-fit: contain;
     filter: drop-shadow(10px 14px 11px rgba(46,29,48,.25));
   }
   .etl-bracket {
     position: absolute;
-    left: 9%;
-    bottom: 9%;
+    left: 8.8%;
+    top: 62.5%;
     width: 36%;
-    height: 8%;
+    height: 6.5%;
     border-bottom: 2px solid #9e648a;
     border-left: 2px solid #9e648a;
     border-right: 2px solid #9e648a;
@@ -510,8 +520,8 @@ HTML = r"""
   }
   .etl-label {
     position: absolute;
-    left: 12%;
-    bottom: 4.5%;
+    left: 11%;
+    top: 69.5%;
     color: #563b4d;
     font-size: clamp(11px, 1.25vw, 17px);
     letter-spacing: .04em;
@@ -520,15 +530,17 @@ HTML = r"""
     position: absolute;
     left: 4%;
     right: 4%;
-    bottom: 1.8%;
-    height: 5.5%;
-    border-top: 2px solid #9e648a;
-    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    top: 75%;
+    height: 11%;
+    border-bottom: 2px solid #9e648a;
+    border-left: 2px solid #9e648a;
+    border-right: 2px solid #9e648a;
+    border-radius: 0 0 48% 48% / 0 0 100% 100%;
   }
   .pipeline-name {
     position: absolute;
     left: 50%;
-    bottom: .4%;
+    top: 87%;
     transform: translateX(-50%);
     color: #3e2939;
     font-size: clamp(14px, 1.8vw, 25px);
@@ -867,10 +879,10 @@ HTML = r"""
             <div class="pipeline-label">${escapeText(s.source_label)}</div>
             <div class="source-stack">${sources}</div>
           </div>
-          <div class="flow-arrow"></div>
+          <div class="flow-arrow arrow-one"></div>
           <div class="pipeline-products">${products}</div>
           <div class="pipeline-note">${s.note}</div>
-          <div class="flow-arrow"></div>
+          <div class="flow-arrow arrow-two"></div>
           <div class="pipeline-result">
             <div class="result-label">${escapeText(s.result_label)}</div>
             <img class="result-image" src="${s.image}" alt="商材別の日報への自動入力結果">

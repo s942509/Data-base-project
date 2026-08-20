@@ -191,7 +191,7 @@ SLIDES = [
         "title": "整理されたデータが、運用できる分析とAI活用につながる",
         "points": [
             "条件を変えて繰り返し使える分析ツール",
-            "部署別のリアルタイムDashboard",
+            "部門別のリアルタイムDashboard",
             "データを検索できるAIエージェント",
         ],
         "tool_image": image_source("tool.png"),
@@ -1481,7 +1481,7 @@ HTML = r"""
     const summary = s.summary ? `
       <aside class="experience-card experience-summary image-summary" data-summary="1">
         <div class="summary-content">
-          <div class="summary-kicker"></div>
+          <div class="summary-kicker">KEY TAKEAWAY</div>
           <p class="summary-text">${escapeText(s.summary)}</p>
         </div>
       </aside>` : '';

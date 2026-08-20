@@ -93,12 +93,12 @@ SLIDES = [
         "ball2": {"x": 21, "y": 9, "size": 18},
     },
     {
-        "type": "morph_slide",
+        "type": "image_slide",
         "num": "04",
         "title": "Shopline APIでの自動化",
-        "image": image_source("slide6_noarror.png"),
-        "ball1": {"x": 59, "y": 61, "size": 18},
-        "ball2": {"x": 59, "y": 61, "size": 13},
+        "image": image_source("slide6.png"),
+        "ball1": {"x": 116, "y": 112, "size": 18},
+        "ball2": {"x": -16, "y": -14, "size": 13},
     },
     {
         "type": "section",

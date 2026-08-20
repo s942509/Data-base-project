@@ -97,6 +97,7 @@ SLIDES = [
         "num": "04",
         "title": "Shopline APIでの自動化",
         "image": image_source("slide6.png"),
+        "summary": "今担当している5商材の日報は、午前9時30分までに更新が完了しています。",
         "ball1": {"x": 116, "y": 112, "size": 18},
         "ball2": {"x": -16, "y": -14, "size": 13},
     },
@@ -879,6 +880,24 @@ HTML = r"""
     letter-spacing: .015em;
     text-shadow: 0 1px 0 rgba(255,255,255,.65);
   }
+  .image-summary {
+    left: 50%;
+    right: auto;
+    bottom: 7.5%;
+    width: 47%;
+    height: 22%;
+    transform: translate(-50%, 18px) scale(.965);
+  }
+  .image-summary.shown {
+    transform: translate(-50%, 0) scale(1);
+  }
+  .image-summary .summary-content {
+    padding: clamp(14px, 1.7vw, 23px);
+    text-align: center;
+  }
+  .image-summary .summary-kicker {
+    justify-content: center;
+  }
 
   .hud {
     position: absolute;
@@ -1031,12 +1050,20 @@ HTML = r"""
   }
 
   function imageSlideMarkup(s) {
+    const summary = s.summary ? `
+      <aside class="experience-card experience-summary image-summary" data-summary="1">
+        <div class="summary-content">
+          <div class="summary-kicker">KEY TAKEAWAY</div>
+          <p class="summary-text">${escapeText(s.summary)}</p>
+        </div>
+      </aside>` : '';
     return `
       <div class="image-slide-layout">
         <h1 class="image-slide-title">${escapeText(s.title)}</h1>
         <figure class="image-slide-figure">
           <img src="${s.image}" alt="日報更新の流れ">
         </figure>
+        ${summary}
       </div>`;
   }
 
@@ -1126,6 +1153,13 @@ HTML = r"""
     drawHud();
   }
 
+  function updateSlideSummary() {
+    if (!slides[index].summary) return;
+    const summary = content.querySelector('[data-summary]');
+    if (summary) summary.classList.toggle('shown', revealStep >= 1);
+    drawHud();
+  }
+
   function drawHud() {
     progress.innerHTML = slides.map((_, i) =>
       `<span class="dot ${i === index ? 'active' : ''}"></span>`
@@ -1133,6 +1167,8 @@ HTML = r"""
     counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
     if (slides[index].type === 'experience' && revealStep < 4) {
       nextHint.innerHTML = `REVEAL ${revealStep + 1} / 4 <span>＋</span>`;
+    } else if (slides[index].summary && revealStep < 1) {
+      nextHint.innerHTML = 'SUMMARY <span>＋</span>';
     } else {
       nextHint.innerHTML = index === slides.length - 1 ? 'RESTART <span>↻</span>' : 'CLICK <span>→</span>';
     }
@@ -1183,6 +1219,11 @@ HTML = r"""
       updateExperience();
       return;
     }
+    if (slides[index].summary && revealStep < 1) {
+      revealStep = 1;
+      updateSlideSummary();
+      return;
+    }
     moveTo(index === slides.length - 1 ? 0 : index + 1);
   }
 
@@ -1191,6 +1232,11 @@ HTML = r"""
     if (slides[index].type === 'experience' && revealStep > 0) {
       revealStep -= 1;
       updateExperience();
+      return;
+    }
+    if (slides[index].summary && revealStep > 0) {
+      revealStep = 0;
+      updateSlideSummary();
       return;
     }
     moveTo(index === 0 ? slides.length - 1 : index - 1);

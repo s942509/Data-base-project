@@ -77,15 +77,10 @@ SLIDES = [
         "ball2": {"x": 96, "y": 8, "size": 14},
     },
     {
-        "type": "pipeline",
+        "type": "image_slide",
         "num": "02",
-        "title": "商材別に抽出・集計",
-        "source_label": "データソース",
-        "sources": ["Cros 受注一", "Cros 受注二"],
-        "products": ["コラーゲン", "プラセンタ", "ナイトコラーゲン", "QQ", "もっちり", "⋮", "CRM売上"],
-        "note": "Taboola売上<br>CC数を補完",
-        "result_label": "各商材の日報へ自動入力",
-        "image": image_source("slide4.png"),
+        "title": "日報更新の流れ",
+        "image": image_source("slide4_2.png"),
         "ball1": {"x": 108, "y": 108, "size": 22},
         "ball2": {"x": -6, "y": -8, "size": 13},
     },
@@ -358,7 +353,53 @@ HTML = r"""
     box-shadow: 0 0 0 5px rgba(151,101,235,.11);
   }
 
-  /* Fourth page: data pipeline */
+  /* Fourth page: use the finished flowchart image directly */
+  .image-slide-layout {
+    position: absolute;
+    inset: 0;
+  }
+  .image-slide-title {
+    position: absolute;
+    z-index: 6;
+    left: 5.8%;
+    top: 6.5%;
+    margin: 0;
+    color: #4b3150;
+    font-size: clamp(23px, 3vw, 42px);
+    font-weight: 900;
+    letter-spacing: .015em;
+  }
+  .image-slide-title::after {
+    content: "";
+    display: block;
+    width: 72px;
+    height: 4px;
+    margin-top: 12px;
+    border-radius: 5px;
+    background: linear-gradient(90deg, #7c3aed, #b78bea);
+  }
+  .image-slide-figure {
+    position: absolute;
+    z-index: 5;
+    left: 4.5%;
+    right: 4.5%;
+    top: 17%;
+    bottom: 8%;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .image-slide-figure img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    background: transparent;
+  }
+
+  /* Legacy pipeline rules are unused; retained only for CSS compatibility. */
   .pipeline-layout {
     position: absolute;
     inset: 0;
@@ -884,41 +925,13 @@ HTML = r"""
       </div>`;
   }
 
-  function pipelineMarkup(s) {
-    const sources = s.sources.map(source =>
-      `<div class="source-box">${escapeText(source)}</div>`
-    ).join('');
-    const products = s.products.map(product =>
-      `<div class="product-item">${escapeText(product)}</div>`
-    ).join('');
+  function imageSlideMarkup(s) {
     return `
-      <div class="pipeline-layout">
-        <h1 class="pipeline-title">${escapeText(s.title)}</h1>
-        <svg class="pipeline-curves" viewBox="0 0 1000 562" preserveAspectRatio="none" aria-hidden="true">
-          <path class="pipeline-curve"
-            d="M88 352 L88 374 Q88 386 101 386 L435 386 Q448 386 448 374 L448 352"></path>
-          <path class="pipeline-curve"
-            d="M28 438 C28 468 48 477 83 477 L458 477
-               C482 477 492 490 500 516
-               C508 490 518 477 542 477 L917 477
-               C952 477 972 468 972 438"></path>
-        </svg>
-        <div class="pipeline-flow">
-          <div class="pipeline-source">
-            <div class="pipeline-label">${escapeText(s.source_label)}</div>
-            <div class="source-stack">${sources}</div>
-          </div>
-          <div class="flow-arrow arrow-one"></div>
-          <div class="pipeline-products">${products}</div>
-          <div class="pipeline-note">${s.note}</div>
-          <div class="flow-arrow arrow-two"></div>
-          <div class="pipeline-result">
-            <div class="result-label">${escapeText(s.result_label)}</div>
-            <img class="result-image" src="${s.image}" alt="商材別の日報への自動入力結果">
-          </div>
-        </div>
-        <div class="etl-label">ETL（Extract / Transform / Load）</div>
-        <div class="pipeline-name">Data Pipeline</div>
+      <div class="image-slide-layout">
+        <h1 class="image-slide-title">${escapeText(s.title)}</h1>
+        <figure class="image-slide-figure">
+          <img src="${s.image}" alt="日報更新の流れ">
+        </figure>
       </div>`;
   }
 
@@ -963,7 +976,7 @@ HTML = r"""
     if (s.type === 'title') return titleMarkup(s);
     if (s.type === 'toc') return tocMarkup(s);
     if (s.type === 'experience') return experienceMarkup(s);
-    if (s.type === 'pipeline') return pipelineMarkup(s);
+    if (s.type === 'image_slide') return imageSlideMarkup(s);
     return sectionMarkup(s);
   }
 

@@ -1,10 +1,22 @@
 # -*- coding: utf-8 -*-
 """Single-stage animated Streamlit presentation."""
 
+import base64
 import json
+from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
+
+
+def image_source(filename):
+    """Embed repository images so the Streamlit iframe never hits CORS issues."""
+    path = Path(__file__).resolve().parent / filename
+    if path.exists():
+        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+        return f"data:image/png;base64,{encoded}"
+    safe_name = filename.replace(" ", "%20")
+    return f"https://raw.githubusercontent.com/s942509/Data-base-project/main/{safe_name}"
 
 
 st.set_page_config(
@@ -41,15 +53,28 @@ SLIDES = [
         "ball2": {"x": 18, "y": 74, "size": 23},
     },
     {
-        "type": "section",
+        "type": "experience",
         "num": "01",
-        "title": "経歴と提案の背景",
-        "points": [
-            "（ここに内容を記載）",
-            "（ここに内容を記載）",
+        "title": "医療ビッグデータ基盤構築の経験",
+        "images": [
+            {
+                "id": "project",
+                "url": image_source("project.png"),
+                "alt": "健康大數據永續平台計畫成果報告",
+            },
+            {
+                "id": "four",
+                "url": image_source("4.png"),
+                "alt": "医療画像とデータ処理の実例",
+            },
+            {
+                "id": "center",
+                "url": image_source("pc center.png"),
+                "alt": "国家高速網路與計算中心",
+            },
         ],
-        "ball1": {"x": -10, "y": 44, "size": 40},
-        "ball2": {"x": 17, "y": 70, "size": 22},
+        "ball1": {"x": -16, "y": 86, "size": 26},
+        "ball2": {"x": 96, "y": 8, "size": 14},
     },
     {
         "type": "section",
@@ -152,6 +177,7 @@ HTML = r"""
     box-shadow: 0 24px 70px rgba(30, 13, 61, .28);
     cursor: pointer;
     user-select: none;
+    outline: none;
   }
 
   .stage::before {
@@ -332,6 +358,92 @@ HTML = r"""
     box-shadow: 0 0 0 5px rgba(151,101,235,.11);
   }
 
+  /* Third page: layered experience images */
+  .experience-layout {
+    position: absolute;
+    inset: 0;
+  }
+  .experience-title {
+    position: absolute;
+    z-index: 9;
+    left: 5.8%;
+    top: 7.5%;
+    margin: 0;
+    color: #412b3b;
+    font-size: clamp(22px, 3.15vw, 43px);
+    font-weight: 900;
+    letter-spacing: .01em;
+  }
+  .experience-title::after {
+    content: "";
+    display: block;
+    width: 72px;
+    height: 4px;
+    margin-top: 13px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #8b5cf6, #d0b9f7);
+  }
+  .experience-card {
+    position: absolute;
+    z-index: 6;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgba(45, 29, 57, .78);
+    border-radius: clamp(7px, .8vw, 13px);
+    background: #fff;
+    box-shadow: 0 9px 24px rgba(33, 20, 48, .25);
+    opacity: 0;
+    transform: translateY(18px) scale(.965);
+    filter: blur(3px);
+    transition:
+      opacity 430ms ease,
+      transform 560ms cubic-bezier(.22,.9,.32,1),
+      filter 430ms ease;
+  }
+  .experience-card.shown {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  .experience-card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #fff;
+  }
+  .experience-project {
+    z-index: 5;
+    top: 3.5%;
+    right: 3.4%;
+    width: 32%;
+    height: 42%;
+  }
+  .experience-four {
+    z-index: 6;
+    left: 2.8%;
+    bottom: 7%;
+    width: 30%;
+    height: 42%;
+  }
+  .experience-center {
+    z-index: 8;
+    left: 23%;
+    top: 28%;
+    width: 53%;
+    height: 55%;
+  }
+  .experience-step {
+    position: absolute;
+    z-index: 11;
+    left: 5.8%;
+    top: 20%;
+    color: #8c6ac9;
+    font-size: clamp(9px, .9vw, 13px);
+    font-weight: 800;
+    letter-spacing: .14em;
+  }
+
   .hud {
     position: absolute;
     z-index: 10;
@@ -391,7 +503,13 @@ HTML = r"""
 </head>
 <body>
   <div class="shell">
-    <main class="stage" id="stage" aria-label="Animated presentation; click for next scene">
+    <main
+      class="stage"
+      id="stage"
+      tabindex="0"
+      role="button"
+      aria-label="Animated presentation; click or press Enter for next scene"
+    >
       <div class="orb orb-a" id="orbA"></div>
       <div class="orb orb-b" id="orbB"></div>
       <section class="content" id="content"></section>
@@ -415,6 +533,7 @@ HTML = r"""
 
   let index = 0;
   let busy = false;
+  let revealStep = 0;
 
   function escapeText(value) {
     return String(value)
@@ -475,10 +594,46 @@ HTML = r"""
       </div>`;
   }
 
+  function experienceMarkup(s) {
+    const project = s.images.find(image => image.id === 'project');
+    const four = s.images.find(image => image.id === 'four');
+    const center = s.images.find(image => image.id === 'center');
+    return `
+      <div class="experience-layout">
+        <h1 class="experience-title">${escapeText(s.title)}</h1>
+        <div class="experience-step" id="experienceStep">CLICK TO REVEAL · 0 / 3</div>
+        <figure class="experience-card experience-project" data-reveal="1">
+          <img src="${project.url}" alt="${escapeText(project.alt)}">
+        </figure>
+        <figure class="experience-card experience-four" data-reveal="2">
+          <img src="${four.url}" alt="${escapeText(four.alt)}">
+        </figure>
+        <figure class="experience-card experience-center" data-reveal="3">
+          <img src="${center.url}" alt="${escapeText(center.alt)}">
+        </figure>
+      </div>`;
+  }
+
   function markup(s) {
     if (s.type === 'title') return titleMarkup(s);
     if (s.type === 'toc') return tocMarkup(s);
+    if (s.type === 'experience') return experienceMarkup(s);
     return sectionMarkup(s);
+  }
+
+  function updateExperience() {
+    if (slides[index].type !== 'experience') return;
+    content.querySelectorAll('[data-reveal]').forEach(card => {
+      const step = Number(card.dataset.reveal);
+      card.classList.toggle('shown', step <= revealStep);
+    });
+    const label = document.getElementById('experienceStep');
+    if (label) {
+      label.textContent = revealStep < 3
+        ? `CLICK TO REVEAL · ${revealStep} / 3`
+        : 'ALL EXPERIENCES · 3 / 3';
+    }
+    drawHud();
   }
 
   function drawHud() {
@@ -486,7 +641,11 @@ HTML = r"""
       `<span class="dot ${i === index ? 'active' : ''}"></span>`
     ).join('');
     counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
-    nextHint.innerHTML = index === slides.length - 1 ? 'RESTART <span>↻</span>' : 'CLICK <span>→</span>';
+    if (slides[index].type === 'experience' && revealStep < 3) {
+      nextHint.innerHTML = `REVEAL ${revealStep + 1} / 3 <span>＋</span>`;
+    } else {
+      nextHint.innerHTML = index === slides.length - 1 ? 'RESTART <span>↻</span>' : 'CLICK <span>→</span>';
+    }
   }
 
   function showInitial() {
@@ -513,6 +672,7 @@ HTML = r"""
 
     setTimeout(() => {
       index = nextIndex;
+      revealStep = 0;
       content.innerHTML = markup(slides[index]);
       content.classList.remove('out');
       void content.offsetWidth;
@@ -523,14 +683,31 @@ HTML = r"""
   }
 
   function next() {
+    if (busy) return;
+    if (slides[index].type === 'experience' && revealStep < 3) {
+      revealStep += 1;
+      updateExperience();
+      return;
+    }
     moveTo(index === slides.length - 1 ? 0 : index + 1);
   }
 
   function previous() {
+    if (busy) return;
+    if (slides[index].type === 'experience' && revealStep > 0) {
+      revealStep -= 1;
+      updateExperience();
+      return;
+    }
     moveTo(index === 0 ? slides.length - 1 : index - 1);
   }
 
+  stage.addEventListener('pointerdown', () => {
+    stage.focus({preventScroll: true});
+  });
+
   stage.addEventListener('click', event => {
+    stage.focus({preventScroll: true});
     const rect = stage.getBoundingClientRect();
     const ripple = document.createElement('span');
     ripple.className = 'ripple';
@@ -541,15 +718,24 @@ HTML = r"""
     next();
   });
 
-  window.addEventListener('keydown', event => {
+  function handleKey(event) {
     if (['ArrowRight', ' ', 'Enter', 'PageDown'].includes(event.key)) {
       event.preventDefault();
+      event.stopPropagation();
       next();
     }
     if (['ArrowLeft', 'PageUp'].includes(event.key)) {
       event.preventDefault();
+      event.stopPropagation();
       previous();
     }
+  }
+
+  window.addEventListener('keydown', handleKey, true);
+  document.addEventListener('keydown', handleKey, true);
+
+  window.addEventListener('load', () => {
+    stage.focus({preventScroll: true});
   });
 
   showInitial();

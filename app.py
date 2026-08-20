@@ -231,6 +231,10 @@ SLIDES = [
         "type": "image_slide",
         "num": "19",
         "title": "業界における取り組み事例",
+        "subtitles": [
+            "カスタムデータ基盤の構築",
+            "社内AIエージェントの構築",
+        ],
         "image": image_source("market.png"),
         "ball1": {"x": 108, "y": 88, "size": 30},
         "ball2": {"x": 88, "y": 78, "size": 17},
@@ -659,6 +663,30 @@ HTML = r"""
     margin-top: 12px;
     border-radius: 5px;
     background: linear-gradient(90deg, #7c3aed, #b78bea);
+  }
+  .image-slide-subtitles {
+    position: absolute;
+    z-index: 8;
+    left: 9%;
+    top: 18.5%;
+    display: flex;
+    flex-direction: column;
+    gap: .35em;
+    color: #503875;
+    font-size: clamp(15px, 1.65vw, 24px);
+    font-weight: 800;
+    line-height: 1.4;
+    letter-spacing: .015em;
+  }
+  .image-slide-subtitles::before {
+    content: "";
+    position: absolute;
+    left: -19px;
+    top: .25em;
+    bottom: .25em;
+    width: 4px;
+    border-radius: 8px;
+    background: linear-gradient(#7c3aed, #b78bea);
   }
   .image-slide-figure {
     position: absolute;
@@ -1446,16 +1474,21 @@ HTML = r"""
   }
 
   function imageSlideMarkup(s) {
+    const subtitles = s.subtitles ? `
+      <div class="image-slide-subtitles">
+        ${s.subtitles.map(line => `<span>${escapeText(line)}</span>`).join('')}
+      </div>` : '';
     const summary = s.summary ? `
       <aside class="experience-card experience-summary image-summary" data-summary="1">
         <div class="summary-content">
-          <div class="summary-kicker">KEY TAKEAWAY</div>
+          <div class="summary-kicker"></div>
           <p class="summary-text">${escapeText(s.summary)}</p>
         </div>
       </aside>` : '';
     return `
       <div class="image-slide-layout">
         <h1 class="image-slide-title">${escapeText(s.title)}</h1>
+        ${subtitles}
         <figure class="image-slide-figure">
           <img src="${s.image}" alt="日報更新の流れ">
         </figure>

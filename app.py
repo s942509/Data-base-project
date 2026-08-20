@@ -510,19 +510,19 @@ HTML = r"""
     position: absolute;
     z-index: 8;
     left: 50%;
-    bottom: 7%;
+    bottom: 12%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
     gap: 18px;
     color: #5d3aa5;
-    font-size: clamp(15px, 1.7vw, 24px);
+    font-size: clamp(20px, 2.2vw, 32px);
     font-weight: 900;
     white-space: nowrap;
   }
   .summary-arrow {
-    width: clamp(75px, 8vw, 116px);
-    height: clamp(30px, 3.1vw, 44px);
+    width: clamp(110px, 11vw, 165px);
+    height: clamp(42px, 4.3vw, 62px);
     background: linear-gradient(90deg, #7c3aed, #a977ec);
     clip-path: polygon(0 22%, 68% 22%, 68% 0, 100% 50%, 68% 100%, 68% 78%, 0 78%);
     filter: drop-shadow(0 7px 10px rgba(84,38,163,.2));

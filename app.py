@@ -102,13 +102,9 @@ SLIDES = [
         "ball2": {"x": -16, "y": -14, "size": 13},
     },
     {
-        "type": "section",
+        "type": "statement",
         "num": "05",
-        "title": "導入方法と期待効果",
-        "points": [
-            "（ここに内容を記載）",
-            "（ここに内容を記載）",
-        ],
+        "text": "では、以上の自動化と、ほかの自動化は、何が違うのでしょうか",
         "ball1": {"x": -9, "y": -16, "size": 38},
         "ball2": {"x": 17, "y": 18, "size": 20},
     },
@@ -345,6 +341,37 @@ HTML = r"""
     border-radius: 50%;
     background: #9765eb;
     box-shadow: 0 0 0 5px rgba(151,101,235,.11);
+  }
+
+  .statement-layout {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9%;
+    text-align: center;
+  }
+  .statement-text {
+    position: relative;
+    z-index: 7;
+    max-width: 88%;
+    margin: 0;
+    color: #51358f;
+    font-size: clamp(26px, 3.7vw, 52px);
+    font-weight: 900;
+    line-height: 1.48;
+    letter-spacing: .015em;
+    text-shadow: 0 2px 0 rgba(255,255,255,.72);
+  }
+  .statement-text::after {
+    content: "";
+    display: block;
+    width: 92px;
+    height: 5px;
+    margin: 26px auto 0;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #7c3aed, #c1a0f2);
   }
 
   /* Fourth page: use the finished flowchart image directly */
@@ -1049,6 +1076,13 @@ HTML = r"""
       </div>`;
   }
 
+  function statementMarkup(s) {
+    return `
+      <div class="statement-layout">
+        <p class="statement-text">${escapeText(s.text)}</p>
+      </div>`;
+  }
+
   function imageSlideMarkup(s) {
     const summary = s.summary ? `
       <aside class="experience-card experience-summary image-summary" data-summary="1">
@@ -1122,6 +1156,7 @@ HTML = r"""
     if (s.type === 'experience') return experienceMarkup(s);
     if (s.type === 'image_slide') return imageSlideMarkup(s);
     if (s.type === 'morph_slide') return morphSlideMarkup(s);
+    if (s.type === 'statement') return statementMarkup(s);
     return sectionMarkup(s);
   }
 

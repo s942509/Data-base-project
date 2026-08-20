@@ -132,6 +132,14 @@ SLIDES = [
         "ball1": {"x": 116, "y": 112, "size": 18},
         "ball2": {"x": -16, "y": -14, "size": 13},
     },
+    {
+        "type": "image_slide",
+        "num": "09",
+        "title": "課題2｜データの保存・表示・連携元が一つのシートに混在",
+        "image": image_source("slide11.png"),
+        "ball1": {"x": 114, "y": 110, "size": 18},
+        "ball2": {"x": -14, "y": -12, "size": 13},
+    },
 ]
 
 

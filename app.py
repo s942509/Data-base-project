@@ -388,6 +388,7 @@ HTML = r"""
   .pipeline-label {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     width: 89%;
     min-height: 35px;
     padding: 7px 13px;
@@ -397,30 +398,43 @@ HTML = r"""
     font-weight: 850;
     letter-spacing: .04em;
     white-space: nowrap;
+    text-align: center;
   }
   .source-stack {
-    position: relative;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 39%;
+    bottom: 0;
     display: grid;
-    gap: 22%;
-    margin-top: 45%;
+    grid-template-rows: 1fr 1fr;
+    row-gap: 25%;
   }
   .source-stack::after {
     content: "";
     position: absolute;
-    z-index: -1;
-    left: 49%;
-    top: 38%;
+    z-index: 0;
+    left: 50%;
+    top: 37.5%;
+    bottom: 37.5%;
     width: 2px;
-    height: 35%;
+    height: auto;
+    transform: translateX(-50%);
     background: #a36890;
   }
   .source-box {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 9px 12px;
     border: 1.5px solid #9b6ff0;
     background: linear-gradient(135deg, rgba(241,232,255,.88), rgba(213,191,249,.82));
     color: #49343d;
     font-size: clamp(10px, 1.05vw, 15px);
     white-space: nowrap;
+    text-align: center;
   }
   .flow-arrow {
     position: absolute;
@@ -448,19 +462,25 @@ HTML = r"""
     top: 18.4%;
     width: 17.3%;
     height: 41.2%;
-    padding: 3% 8% 5%;
+    padding: 3.5% 9% 4.5%;
     border: 2px solid #8b5cf6;
     background: rgba(255,255,255,.24);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: flex-start;
+    overflow: hidden;
   }
   .product-item {
+    display: block;
+    width: 100%;
     color: #49343e;
-    font-size: clamp(10px, 1.12vw, 16px);
+    font-size: clamp(9px, .98vw, 14px);
     line-height: 1.15;
     white-space: nowrap;
     word-break: keep-all;
+    overflow: hidden;
+    text-overflow: clip;
   }
   .pipeline-note {
     position: absolute;
@@ -475,8 +495,8 @@ HTML = r"""
   .pipeline-note::after {
     content: "";
     position: absolute;
-    right: 105%;
-    width: 65%;
+    right: 103%;
+    width: 27%;
     height: 2px;
     transform-origin: right center;
     background: #9f648a;

@@ -185,6 +185,56 @@ SLIDES = [
         "ball1": {"x": 83, "y": 68, "size": 38},
         "ball2": {"x": 68, "y": 78, "size": 20},
     },
+    {
+        "type": "ai_tools",
+        "num": "15",
+        "title": "整理されたデータが、運用できる分析とAI活用につながる",
+        "points": [
+            "条件を変えて繰り返し使える分析ツール",
+            "部門別のリアルタイムDashboard",
+            "データを検索できるAIエージェント",
+        ],
+        "tool_image": image_source("tool.png"),
+        "agent_image": image_source("ai agent.png"),
+        "ball1": {"x": 112, "y": 105, "size": 18},
+        "ball2": {"x": -14, "y": -12, "size": 13},
+    },
+    {
+        "type": "steps",
+        "num": "16",
+        "title": "推奨する導入順序｜小さく始め、効果を確認しながら拡張",
+        "steps": [
+            {"num": "01", "title": "データの構造化", "body": "Pipelineを構築し、自動化の土台を整備"},
+            {"num": "02", "title": "データベース構築・共通データソース", "body": "履歴データと表示を分離"},
+            {"num": "03", "title": "Dashboard / AI Agent", "body": "データ品質を確認して導入"},
+        ],
+        "ball1": {"x": 88, "y": 82, "size": 31},
+        "ball2": {"x": 74, "y": 67, "size": 17},
+    },
+    {
+        "type": "full_image",
+        "num": "17",
+        "image": image_source("n8n.png"),
+        "alt": "n8nによるワークフロー自動化",
+        "ball1": {"x": 116, "y": 112, "size": 18},
+        "ball2": {"x": -16, "y": -14, "size": 13},
+    },
+    {
+        "type": "image_slide",
+        "num": "18",
+        "title": "公的支援制度は、最新の申請条件を確認して活用",
+        "image": image_source("money.png"),
+        "ball1": {"x": 116, "y": 112, "size": 18},
+        "ball2": {"x": -16, "y": -14, "size": 13},
+    },
+    {
+        "type": "image_slide",
+        "num": "19",
+        "title": "業界における取り組み事例",
+        "image": image_source("market.png"),
+        "ball1": {"x": 108, "y": 88, "size": 30},
+        "ball2": {"x": 88, "y": 78, "size": 17},
+    },
 ]
 
 
@@ -510,23 +560,80 @@ HTML = r"""
     position: absolute;
     z-index: 8;
     left: 50%;
-    bottom: 12%;
+    bottom: 7%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
     gap: 18px;
     color: #5d3aa5;
-    font-size: clamp(20px, 2.2vw, 32px);
+    font-size: clamp(15px, 1.7vw, 24px);
     font-weight: 900;
     white-space: nowrap;
   }
   .summary-arrow {
-    width: clamp(110px, 11vw, 165px);
-    height: clamp(42px, 4.3vw, 62px);
+    width: clamp(75px, 8vw, 116px);
+    height: clamp(30px, 3.1vw, 44px);
     background: linear-gradient(90deg, #7c3aed, #a977ec);
     clip-path: polygon(0 22%, 68% 22%, 68% 0, 100% 50%, 68% 100%, 68% 78%, 0 78%);
     filter: drop-shadow(0 7px 10px rgba(84,38,163,.2));
   }
+
+  .ai-tools-layout { position: absolute; inset: 0; padding: 5.6% 5.5%; }
+  .ai-tools-title {
+    position: relative; z-index: 8; width: 88%; margin: 0;
+    color: #4b3150; font-size: clamp(23px, 2.85vw, 40px);
+    font-weight: 900; line-height: 1.3;
+  }
+  .ai-tools-points {
+    position: absolute; z-index: 8; left: 6%; top: 25%; width: 37%;
+    margin: 0; padding-left: 1.5em; color: #554164;
+    font-size: clamp(12px, 1.35vw, 19px); line-height: 1.85;
+  }
+  .ai-tool-image, .ai-agent-image {
+    position: absolute; z-index: 7; display: block; object-fit: contain;
+    filter: drop-shadow(0 13px 18px rgba(47,27,78,.18));
+  }
+  .ai-tool-image { right: 7%; top: 17%; width: 45%; height: 43%; }
+  .ai-agent-image { right: 6%; bottom: 7%; width: 55%; height: 29%; }
+
+  .steps-layout { position: absolute; inset: 0; padding: 6% 5.5%; }
+  .steps-title {
+    margin: 0; color: #4b3150; font-size: clamp(23px, 2.85vw, 40px);
+    font-weight: 900; line-height: 1.3;
+  }
+  .steps-row {
+    position: absolute; left: 6%; right: 6%; top: 31%; bottom: 17%;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.2%;
+    align-items: center;
+  }
+  .step-card {
+    position: relative; min-height: 64%; padding: 8% 8% 7%;
+    border: 1px solid rgba(139,92,246,.26); border-radius: 22px;
+    background: linear-gradient(145deg, rgba(255,255,255,.78), rgba(231,214,255,.55));
+    box-shadow: 0 18px 38px rgba(91,51,152,.13), inset 0 1px rgba(255,255,255,.9);
+    opacity: 0; transform: translateX(-38px) translateY(18px) scale(.94);
+    filter: blur(5px); transition: opacity 480ms ease, transform 650ms cubic-bezier(.22,.9,.32,1), filter 480ms ease;
+  }
+  .step-card:nth-child(2) { transform: translateX(-28px) translateY(-2%) scale(.94); }
+  .step-card:nth-child(3) { transform: translateX(-18px) translateY(-10%) scale(.94); }
+  .step-card.shown { opacity: 1; filter: blur(0); transform: translate(0,0) scale(1); }
+  .step-number {
+    color: #8b5cf6; font-size: clamp(28px, 4vw, 56px); font-weight: 900;
+    letter-spacing: .04em; line-height: 1;
+  }
+  .step-card h2 { margin: 12% 0 7%; color: #503875; font-size: clamp(14px, 1.55vw, 22px); line-height: 1.4; }
+  .step-card p { margin: 0; color: #705e87; font-size: clamp(11px, 1.1vw, 16px); line-height: 1.65; }
+  .step-card:not(:last-child)::after {
+    content: "→"; position: absolute; right: -14%; top: 42%; z-index: 9;
+    color: #9b6be8; font-size: clamp(24px, 3vw, 42px); font-weight: 900;
+  }
+  .steps-status {
+    position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%);
+    color: #8c6ac9; font-size: clamp(9px, .9vw, 13px); font-weight: 850; letter-spacing: .14em;
+  }
+
+  .full-image-layout { position: absolute; inset: 0; padding: 4.5%; }
+  .full-image-layout img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
 
   /* Fourth page: use the finished flowchart image directly */
   .image-slide-layout {
@@ -1308,6 +1415,36 @@ HTML = r"""
       </div>`;
   }
 
+  function aiToolsMarkup(s) {
+    const points = s.points.map(point => `<li>${escapeText(point)}</li>`).join('');
+    return `
+      <div class="ai-tools-layout">
+        <h1 class="ai-tools-title">${escapeText(s.title)}</h1>
+        <ul class="ai-tools-points">${points}</ul>
+        <img class="ai-tool-image" src="${s.tool_image}" alt="分析ツール">
+        <img class="ai-agent-image" src="${s.agent_image}" alt="AIエージェント">
+      </div>`;
+  }
+
+  function stepsMarkup(s) {
+    const cards = s.steps.map((step, i) => `
+      <article class="step-card" data-step="${i + 1}">
+        <div class="step-number">${escapeText(step.num)}</div>
+        <h2>${escapeText(step.title)}</h2>
+        <p>${escapeText(step.body)}</p>
+      </article>`).join('');
+    return `
+      <div class="steps-layout">
+        <h1 class="steps-title">${escapeText(s.title)}</h1>
+        <div class="steps-row">${cards}</div>
+        <div class="steps-status" id="stepsStatus">CLICK TO REVEAL · 0 / 3</div>
+      </div>`;
+  }
+
+  function fullImageMarkup(s) {
+    return `<figure class="full-image-layout"><img src="${s.image}" alt="${escapeText(s.alt || '')}"></figure>`;
+  }
+
   function imageSlideMarkup(s) {
     const summary = s.summary ? `
       <aside class="experience-card experience-summary image-summary" data-summary="1">
@@ -1398,6 +1535,9 @@ HTML = r"""
     if (s.type === 'statement') return statementMarkup(s);
     if (s.type === 'topic') return topicMarkup(s);
     if (s.type === 'summary_slide') return summarySlideMarkup(s);
+    if (s.type === 'ai_tools') return aiToolsMarkup(s);
+    if (s.type === 'steps') return stepsMarkup(s);
+    if (s.type === 'full_image') return fullImageMarkup(s);
     return sectionMarkup(s);
   }
 
@@ -1443,6 +1583,18 @@ HTML = r"""
     drawHud();
   }
 
+  function updateSteps() {
+    if (slides[index].type !== 'steps') return;
+    content.querySelectorAll('[data-step]').forEach(card => {
+      card.classList.toggle('shown', Number(card.dataset.step) <= revealStep);
+    });
+    const label = document.getElementById('stepsStatus');
+    if (label) label.textContent = revealStep < 3
+      ? `CLICK TO REVEAL · ${revealStep} / 3`
+      : 'READY TO EXPAND · 3 / 3';
+    drawHud();
+  }
+
   function drawHud() {
     progress.innerHTML = slides.map((_, i) =>
       `<span class="dot ${i === index ? 'active' : ''}"></span>`
@@ -1454,6 +1606,8 @@ HTML = r"""
       nextHint.innerHTML = 'SUMMARY <span>＋</span>';
     } else if (slides[index].type === 'reveal_image' && revealStep < 1) {
       nextHint.innerHTML = 'PYTHON <span>＋</span>';
+    } else if (slides[index].type === 'steps' && revealStep < 3) {
+      nextHint.innerHTML = `STEP ${revealStep + 1} / 3 <span>＋</span>`;
     } else {
       nextHint.innerHTML = index === slides.length - 1 ? 'RESTART <span>↻</span>' : 'CLICK <span>→</span>';
     }
@@ -1514,6 +1668,11 @@ HTML = r"""
       updateRevealImage();
       return;
     }
+    if (slides[index].type === 'steps' && revealStep < 3) {
+      revealStep += 1;
+      updateSteps();
+      return;
+    }
     moveTo(index === slides.length - 1 ? 0 : index + 1);
   }
 
@@ -1532,6 +1691,11 @@ HTML = r"""
     if (slides[index].type === 'reveal_image' && revealStep > 0) {
       revealStep = 0;
       updateRevealImage();
+      return;
+    }
+    if (slides[index].type === 'steps' && revealStep > 0) {
+      revealStep -= 1;
+      updateSteps();
       return;
     }
     moveTo(index === 0 ? slides.length - 1 : index - 1);

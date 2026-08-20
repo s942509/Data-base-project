@@ -444,6 +444,86 @@ HTML = r"""
     letter-spacing: .14em;
   }
 
+  /* Fourth reveal: liquid-glass summary */
+  .experience-summary {
+    z-index: 10;
+    right: 3.2%;
+    bottom: 7.5%;
+    width: 35%;
+    height: 27%;
+    border: 0;
+    border-radius: clamp(16px, 2vw, 28px);
+    background: transparent;
+    box-shadow: 0 18px 44px rgba(71, 38, 126, .20);
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .experience-summary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, .72);
+    background: linear-gradient(135deg,
+      rgba(255,255,255,.62),
+      rgba(236,224,255,.28) 52%,
+      rgba(255,255,255,.48));
+    box-shadow:
+      inset 0 0 15px rgba(255,255,255,.78),
+      inset 0 -18px 32px rgba(140,92,225,.08);
+    pointer-events: none;
+  }
+  .experience-summary::after {
+    content: "";
+    position: absolute;
+    inset: -7%;
+    z-index: -1;
+    border-radius: inherit;
+    background: rgba(255,255,255,.14);
+    backdrop-filter: blur(12px) saturate(135%);
+    -webkit-backdrop-filter: blur(12px) saturate(135%);
+    filter: url(#glass-distortion);
+    pointer-events: none;
+  }
+  .summary-content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(15px, 2vw, 27px);
+    color: #4f377e;
+  }
+  .summary-kicker {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: clamp(8px, 1vw, 14px);
+    color: #8b5cf6;
+    font-size: clamp(9px, .85vw, 12px);
+    font-weight: 900;
+    letter-spacing: .16em;
+  }
+  .summary-kicker::before {
+    content: "";
+    width: 25px;
+    height: 3px;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #7c3aed, #c4a4f5);
+  }
+  .summary-text {
+    margin: 0;
+    color: #49356f;
+    font-size: clamp(12px, 1.45vw, 20px);
+    font-weight: 780;
+    line-height: 1.65;
+    letter-spacing: .015em;
+    text-shadow: 0 1px 0 rgba(255,255,255,.65);
+  }
+
   .hud {
     position: absolute;
     z-index: 10;
@@ -600,8 +680,19 @@ HTML = r"""
     const center = s.images.find(image => image.id === 'center');
     return `
       <div class="experience-layout">
+        <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+          <defs>
+            <filter id="glass-distortion" x="-20%" y="-20%" width="140%" height="140%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.025 0.025"
+                numOctaves="2" seed="92" result="noise"></feTurbulence>
+              <feGaussianBlur in="noise" stdDeviation="2" result="blurred"></feGaussianBlur>
+              <feDisplacementMap in="SourceGraphic" in2="blurred" scale="42"
+                xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+            </filter>
+          </defs>
+        </svg>
         <h1 class="experience-title">${escapeText(s.title)}</h1>
-        <div class="experience-step" id="experienceStep">CLICK TO REVEAL · 0 / 3</div>
+        <div class="experience-step" id="experienceStep">CLICK TO REVEAL · 0 / 4</div>
         <figure class="experience-card experience-project" data-reveal="1">
           <img src="${project.url}" alt="${escapeText(project.alt)}">
         </figure>
@@ -611,6 +702,12 @@ HTML = r"""
         <figure class="experience-card experience-center" data-reveal="3">
           <img src="${center.url}" alt="${escapeText(center.alt)}">
         </figure>
+        <aside class="experience-card experience-summary" data-reveal="4">
+          <div class="summary-content">
+            <div class="summary-kicker">KEY TAKEAWAY</div>
+            <p class="summary-text">画像もデータも、AI学習に活用できる<br>「品質・規格・量」を確保することがポイントです。</p>
+          </div>
+        </aside>
       </div>`;
   }
 
@@ -629,9 +726,9 @@ HTML = r"""
     });
     const label = document.getElementById('experienceStep');
     if (label) {
-      label.textContent = revealStep < 3
-        ? `CLICK TO REVEAL · ${revealStep} / 3`
-        : 'ALL EXPERIENCES · 3 / 3';
+      label.textContent = revealStep < 4
+        ? `CLICK TO REVEAL · ${revealStep} / 4`
+        : 'KEY TAKEAWAY · 4 / 4';
     }
     drawHud();
   }
@@ -641,8 +738,8 @@ HTML = r"""
       `<span class="dot ${i === index ? 'active' : ''}"></span>`
     ).join('');
     counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
-    if (slides[index].type === 'experience' && revealStep < 3) {
-      nextHint.innerHTML = `REVEAL ${revealStep + 1} / 3 <span>＋</span>`;
+    if (slides[index].type === 'experience' && revealStep < 4) {
+      nextHint.innerHTML = `REVEAL ${revealStep + 1} / 4 <span>＋</span>`;
     } else {
       nextHint.innerHTML = index === slides.length - 1 ? 'RESTART <span>↻</span>' : 'CLICK <span>→</span>';
     }
@@ -684,7 +781,7 @@ HTML = r"""
 
   function next() {
     if (busy) return;
-    if (slides[index].type === 'experience' && revealStep < 3) {
+    if (slides[index].type === 'experience' && revealStep < 4) {
       revealStep += 1;
       updateExperience();
       return;

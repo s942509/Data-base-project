@@ -396,6 +396,7 @@ HTML = r"""
     font-size: clamp(11px, 1.25vw, 17px);
     font-weight: 850;
     letter-spacing: .04em;
+    white-space: nowrap;
   }
   .source-stack {
     position: relative;
@@ -415,16 +416,17 @@ HTML = r"""
   }
   .source-box {
     padding: 9px 12px;
-    border: 1.5px solid #ef7b42;
-    background: linear-gradient(135deg, rgba(255,220,206,.82), rgba(250,177,148,.78));
+    border: 1.5px solid #9b6ff0;
+    background: linear-gradient(135deg, rgba(241,232,255,.88), rgba(213,191,249,.82));
     color: #49343d;
     font-size: clamp(10px, 1.05vw, 15px);
+    white-space: nowrap;
   }
   .flow-arrow {
     position: absolute;
     width: 5%;
     height: 20px;
-    background: linear-gradient(90deg, #d94768, #ee5b76);
+    background: linear-gradient(90deg, #7c3aed, #a56ce5);
     filter: drop-shadow(0 2px 2px rgba(85,28,57,.15));
   }
   .flow-arrow::after {
@@ -435,11 +437,11 @@ HTML = r"""
     transform: translateY(-50%);
     border-top: 20px solid transparent;
     border-bottom: 20px solid transparent;
-    border-left: 20px solid #ee5b76;
+    border-left: 20px solid #a56ce5;
   }
   .arrow-one { left: 22.4%; top: 34.5%; }
-  .arrow-two { left: 66.5%; top: 36%; background: linear-gradient(90deg, #9d658b, #ab7199); }
-  .arrow-two::after { border-left-color: #ab7199; }
+  .arrow-two { left: 66.5%; top: 36%; background: linear-gradient(90deg, #8b5cf6, #ae7ce9); }
+  .arrow-two::after { border-left-color: #ae7ce9; }
   .pipeline-products {
     position: absolute;
     left: 35%;
@@ -447,16 +449,18 @@ HTML = r"""
     width: 17.3%;
     height: 41.2%;
     padding: 3% 8% 5%;
-    border: 2px solid #44a82e;
-    background: rgba(255,255,255,.16);
+    border: 2px solid #8b5cf6;
+    background: rgba(255,255,255,.24);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
   }
   .product-item {
     color: #49343e;
-    font-size: clamp(11px, 1.35vw, 19px);
+    font-size: clamp(10px, 1.12vw, 16px);
     line-height: 1.15;
+    white-space: nowrap;
+    word-break: keep-all;
   }
   .pipeline-note {
     position: absolute;
@@ -498,6 +502,7 @@ HTML = r"""
     text-align: center;
     font-size: clamp(10px, 1.15vw, 16px);
     font-weight: 850;
+    white-space: nowrap;
   }
   .result-image {
     display: block;
@@ -507,40 +512,35 @@ HTML = r"""
     object-fit: contain;
     filter: drop-shadow(10px 14px 11px rgba(46,29,48,.25));
   }
-  .etl-bracket {
+  .pipeline-curves {
     position: absolute;
-    left: 8.8%;
-    top: 62.5%;
-    width: 36%;
-    height: 6.5%;
-    border-bottom: 2px solid #9e648a;
-    border-left: 2px solid #9e648a;
-    border-right: 2px solid #9e648a;
-    border-radius: 0 0 12px 12px;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .pipeline-curve {
+    fill: none;
+    stroke: #8f62c8;
+    stroke-width: 2.1;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
   .etl-label {
     position: absolute;
-    left: 11%;
-    top: 69.5%;
+    left: 10.5%;
+    top: 70.5%;
     color: #563b4d;
     font-size: clamp(11px, 1.25vw, 17px);
     letter-spacing: .04em;
   }
-  .pipeline-brace {
-    position: absolute;
-    left: 4%;
-    right: 4%;
-    top: 75%;
-    height: 11%;
-    border-bottom: 2px solid #9e648a;
-    border-left: 2px solid #9e648a;
-    border-right: 2px solid #9e648a;
-    border-radius: 0 0 48% 48% / 0 0 100% 100%;
-  }
   .pipeline-name {
     position: absolute;
     left: 50%;
-    top: 87%;
+    top: 89.2%;
     transform: translateX(-50%);
     color: #3e2939;
     font-size: clamp(14px, 1.8vw, 25px);
@@ -874,6 +874,15 @@ HTML = r"""
     return `
       <div class="pipeline-layout">
         <h1 class="pipeline-title">${escapeText(s.title)}</h1>
+        <svg class="pipeline-curves" viewBox="0 0 1000 562" preserveAspectRatio="none" aria-hidden="true">
+          <path class="pipeline-curve"
+            d="M88 352 L88 374 Q88 386 101 386 L435 386 Q448 386 448 374 L448 352"></path>
+          <path class="pipeline-curve"
+            d="M28 438 C28 468 48 477 83 477 L458 477
+               C482 477 492 490 500 516
+               C508 490 518 477 542 477 L917 477
+               C952 477 972 468 972 438"></path>
+        </svg>
         <div class="pipeline-flow">
           <div class="pipeline-source">
             <div class="pipeline-label">${escapeText(s.source_label)}</div>
@@ -888,9 +897,7 @@ HTML = r"""
             <img class="result-image" src="${s.image}" alt="商材別の日報への自動入力結果">
           </div>
         </div>
-        <div class="etl-bracket"></div>
         <div class="etl-label">ETL（Extract / Transform / Load）</div>
-        <div class="pipeline-brace"></div>
         <div class="pipeline-name">Data Pipeline</div>
       </div>`;
   }

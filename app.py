@@ -109,15 +109,13 @@ SLIDES = [
         "ball2": {"x": 17, "y": 18, "size": 20},
     },
     {
-        "type": "section",
+        "type": "reveal_image",
         "num": "06",
-        "title": "今後の進め方",
-        "points": [
-            "（ここに内容を記載）",
-            "（ここに内容を記載）",
-        ],
-        "ball1": {"x": 70, "y": 62, "size": 43},
-        "ball2": {"x": 50, "y": 76, "size": 21},
+        "title": "個別作業とシステム間の分断を、同時に改善",
+        "image": image_source("slide8.png"),
+        "overlay": image_source("slide8_py.png"),
+        "ball1": {"x": 114, "y": 110, "size": 18},
+        "ball2": {"x": -14, "y": -12, "size": 13},
     },
 ]
 
@@ -359,7 +357,7 @@ HTML = r"""
     margin: 0;
     color: #51358f;
     font-size: clamp(26px, 3.7vw, 52px);
-    font-weight: 500;
+    font-weight: 900;
     line-height: 1.48;
     letter-spacing: .015em;
     text-shadow: 0 2px 0 rgba(255,255,255,.72);
@@ -418,6 +416,54 @@ HTML = r"""
     object-fit: contain;
     object-position: center;
     background: transparent;
+  }
+
+  .reveal-image-layout {
+    position: absolute;
+    inset: 0;
+  }
+  .reveal-main-figure {
+    position: absolute;
+    z-index: 5;
+    left: 4.5%;
+    right: 4.5%;
+    top: 17%;
+    bottom: 13%;
+    margin: 0;
+  }
+  .reveal-main-figure img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+  .reveal-python {
+    position: absolute;
+    z-index: 9;
+    left: 3%;
+    right: 3%;
+    bottom: 2.8%;
+    height: 22%;
+    opacity: 0;
+    transform: translateY(20px) scale(.98);
+    filter: blur(4px);
+    transition:
+      opacity 480ms ease,
+      transform 620ms cubic-bezier(.22,.9,.32,1),
+      filter 480ms ease;
+  }
+  .reveal-python.shown {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  .reveal-python img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
   }
 
   /* Sixth page: the two guide orbs merge and become the flow arrow. */
@@ -1101,6 +1147,19 @@ HTML = r"""
       </div>`;
   }
 
+  function revealImageMarkup(s) {
+    return `
+      <div class="reveal-image-layout">
+        <h1 class="image-slide-title">${escapeText(s.title)}</h1>
+        <figure class="reveal-main-figure">
+          <img src="${s.image}" alt="システム連携の全体像">
+        </figure>
+        <div class="reveal-python" id="revealPython">
+          <img src="${s.overlay}" alt="Pythonによる連携範囲">
+        </div>
+      </div>`;
+  }
+
   function morphSlideMarkup(s) {
     return `
       <div class="morph-slide-layout">
@@ -1155,6 +1214,7 @@ HTML = r"""
     if (s.type === 'toc') return tocMarkup(s);
     if (s.type === 'experience') return experienceMarkup(s);
     if (s.type === 'image_slide') return imageSlideMarkup(s);
+    if (s.type === 'reveal_image') return revealImageMarkup(s);
     if (s.type === 'morph_slide') return morphSlideMarkup(s);
     if (s.type === 'statement') return statementMarkup(s);
     return sectionMarkup(s);
@@ -1195,6 +1255,13 @@ HTML = r"""
     drawHud();
   }
 
+  function updateRevealImage() {
+    if (slides[index].type !== 'reveal_image') return;
+    const overlay = document.getElementById('revealPython');
+    if (overlay) overlay.classList.toggle('shown', revealStep >= 1);
+    drawHud();
+  }
+
   function drawHud() {
     progress.innerHTML = slides.map((_, i) =>
       `<span class="dot ${i === index ? 'active' : ''}"></span>`
@@ -1204,6 +1271,8 @@ HTML = r"""
       nextHint.innerHTML = `REVEAL ${revealStep + 1} / 4 <span>＋</span>`;
     } else if (slides[index].summary && revealStep < 1) {
       nextHint.innerHTML = 'SUMMARY <span>＋</span>';
+    } else if (slides[index].type === 'reveal_image' && revealStep < 1) {
+      nextHint.innerHTML = 'PYTHON <span>＋</span>';
     } else {
       nextHint.innerHTML = index === slides.length - 1 ? 'RESTART <span>↻</span>' : 'CLICK <span>→</span>';
     }
@@ -1259,6 +1328,11 @@ HTML = r"""
       updateSlideSummary();
       return;
     }
+    if (slides[index].type === 'reveal_image' && revealStep < 1) {
+      revealStep = 1;
+      updateRevealImage();
+      return;
+    }
     moveTo(index === slides.length - 1 ? 0 : index + 1);
   }
 
@@ -1272,6 +1346,11 @@ HTML = r"""
     if (slides[index].summary && revealStep > 0) {
       revealStep = 0;
       updateSlideSummary();
+      return;
+    }
+    if (slides[index].type === 'reveal_image' && revealStep > 0) {
+      revealStep = 0;
+      updateRevealImage();
       return;
     }
     moveTo(index === 0 ? slides.length - 1 : index - 1);

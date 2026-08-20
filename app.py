@@ -266,7 +266,7 @@ HTML = r"""
     margin: 0;
     color: #6625d1;
     font-size: clamp(24px, 4vw, 55px);
-    font-weight: 900;
+    font-weight: 400;
     line-height: 1.22;
     letter-spacing: .01em;
   }

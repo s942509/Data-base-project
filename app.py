@@ -93,13 +93,10 @@ SLIDES = [
         "ball2": {"x": 21, "y": 9, "size": 18},
     },
     {
-        "type": "section",
+        "type": "image_slide",
         "num": "04",
-        "title": "改善の全体設計",
-        "points": [
-            "（ここに内容を記載）",
-            "（ここに内容を記載）",
-        ],
+        "title": "Shopline APIでの自動化",
+        "image": image_source("slide6.png"),
         "ball1": {"x": 69, "y": 65, "size": 42},
         "ball2": {"x": 55, "y": 50, "size": 20},
     },

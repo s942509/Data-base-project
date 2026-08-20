@@ -148,6 +148,43 @@ SLIDES = [
         "ball1": {"x": 116, "y": 112, "size": 18},
         "ball2": {"x": -16, "y": -14, "size": 13},
     },
+    {
+        "type": "image_slide",
+        "num": "11",
+        "title": "課題3｜名称と項目定義の不統一が、分析と自動連携を難しくする",
+        "image": image_source("table.png"),
+        "ball1": {"x": 116, "y": 112, "size": 18},
+        "ball2": {"x": -16, "y": -14, "size": 13},
+    },
+    {
+        "type": "topic",
+        "num": "12",
+        "title": "課題3｜名称と項目定義の不統一が、分析と自動連携を難しくする",
+        "subtitle": "広告パラメータのルールが不明確",
+        "ball1": {"x": 113, "y": 105, "size": 18},
+        "ball2": {"x": -14, "y": -12, "size": 13},
+    },
+    {
+        "type": "image_slide",
+        "num": "13",
+        "title": "明確な項目定義が、安定した分析と自動化の前提",
+        "image": image_source("slide15order_state.png"),
+        "ball1": {"x": 116, "y": 112, "size": 18},
+        "ball2": {"x": -16, "y": -14, "size": 13},
+    },
+    {
+        "type": "summary_slide",
+        "num": "14",
+        "title": "手作業への依存を生む三つの構造的な課題",
+        "items": [
+            "課題1｜システム・シート間の転記が多く、業務が分断されている",
+            "課題2｜データの保存・表示・連携元が一つのシートに混在",
+            "課題3｜名称と項目定義の不統一が、分析と自動連携を難しくする",
+        ],
+        "proposal": "データ基盤構築の提案",
+        "ball1": {"x": 83, "y": 68, "size": 38},
+        "ball2": {"x": 68, "y": 78, "size": 20},
+    },
 ]
 
 
@@ -401,6 +438,94 @@ HTML = r"""
     margin: 26px auto 0;
     border-radius: 8px;
     background: linear-gradient(90deg, #7c3aed, #c1a0f2);
+  }
+
+  .topic-layout {
+    position: absolute;
+    inset: 0;
+    padding: 6.4% 6%;
+  }
+  .topic-title {
+    max-width: 94%;
+    margin: 0;
+    color: #4b3150;
+    font-size: clamp(22px, 2.75vw, 39px);
+    font-weight: 900;
+    line-height: 1.3;
+    letter-spacing: .012em;
+  }
+  .topic-subtitle {
+    margin: 4.5% 0 0 10.5%;
+    color: #493744;
+    font-size: clamp(19px, 2.25vw, 32px);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .topic-subtitle::before {
+    content: "";
+    display: inline-block;
+    width: 38px;
+    height: 4px;
+    margin: 0 15px .25em 0;
+    border-radius: 9px;
+    background: linear-gradient(90deg, #7c3aed, #c1a0f2);
+  }
+
+  .summary-slide-layout {
+    position: absolute;
+    inset: 0;
+    padding: 6% 7%;
+  }
+  .summary-slide-title {
+    position: relative;
+    z-index: 7;
+    max-width: 78%;
+    margin: 0;
+    color: #4b3150;
+    font-size: clamp(24px, 3.05vw, 43px);
+    font-weight: 900;
+    line-height: 1.3;
+  }
+  .summary-slide-list {
+    position: relative;
+    z-index: 7;
+    width: 78%;
+    margin-top: 4.2%;
+    display: grid;
+    gap: clamp(9px, 1.15vw, 17px);
+  }
+  .summary-slide-item {
+    padding: clamp(10px, 1.25vw, 18px) clamp(14px, 1.7vw, 24px);
+    border: 1px solid rgba(139,92,246,.24);
+    border-radius: 16px;
+    color: #503d66;
+    background: linear-gradient(115deg, rgba(255,255,255,.72), rgba(238,226,255,.42));
+    box-shadow: 0 10px 28px rgba(91,51,152,.08), inset 0 1px rgba(255,255,255,.8);
+    backdrop-filter: blur(7px);
+    font-size: clamp(12px, 1.35vw, 19px);
+    font-weight: 650;
+    line-height: 1.45;
+  }
+  .summary-proposal {
+    position: absolute;
+    z-index: 8;
+    left: 50%;
+    bottom: 7%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    color: #5d3aa5;
+    font-size: clamp(15px, 1.7vw, 24px);
+    font-weight: 900;
+    white-space: nowrap;
+  }
+  .summary-arrow {
+    width: clamp(75px, 8vw, 116px);
+    height: clamp(30px, 3.1vw, 44px);
+    background: linear-gradient(90deg, #7c3aed, #a977ec);
+    clip-path: polygon(0 22%, 68% 22%, 68% 0, 100% 50%, 68% 100%, 68% 78%, 0 78%);
+    filter: drop-shadow(0 7px 10px rgba(84,38,163,.2));
   }
 
   /* Fourth page: use the finished flowchart image directly */
@@ -1160,6 +1285,29 @@ HTML = r"""
       </div>`;
   }
 
+  function topicMarkup(s) {
+    return `
+      <div class="topic-layout">
+        <h1 class="topic-title">${escapeText(s.title)}</h1>
+        <p class="topic-subtitle">${escapeText(s.subtitle)}</p>
+      </div>`;
+  }
+
+  function summarySlideMarkup(s) {
+    const items = s.items.map(item =>
+      `<div class="summary-slide-item">${escapeText(item)}</div>`
+    ).join('');
+    return `
+      <div class="summary-slide-layout">
+        <h1 class="summary-slide-title">${escapeText(s.title)}</h1>
+        <div class="summary-slide-list">${items}</div>
+        <div class="summary-proposal">
+          <span class="summary-arrow" aria-hidden="true"></span>
+          <span>${escapeText(s.proposal)}</span>
+        </div>
+      </div>`;
+  }
+
   function imageSlideMarkup(s) {
     const summary = s.summary ? `
       <aside class="experience-card experience-summary image-summary" data-summary="1">
@@ -1248,6 +1396,8 @@ HTML = r"""
     if (s.type === 'reveal_image') return revealImageMarkup(s);
     if (s.type === 'morph_slide') return morphSlideMarkup(s);
     if (s.type === 'statement') return statementMarkup(s);
+    if (s.type === 'topic') return topicMarkup(s);
+    if (s.type === 'summary_slide') return summarySlideMarkup(s);
     return sectionMarkup(s);
   }
 

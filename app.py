@@ -77,17 +77,17 @@ SLIDES = [
         "ball2": {"x": 96, "y": 8, "size": 14},
     },
     {
-        "type": "section",
+        "type": "pipeline",
         "num": "02",
-        "title": "自動化の実例と成果",
-        "points": [
-            "日報タブの月次複製をGASで自動化",
-            "収益実績シートの金額・数量集計を自動更新",
-            "広告実績をPythonで取得し、月次日報へ反映",
-            "週報と日報を連携し、媒体別実績を自動集計",
-        ],
-        "ball1": {"x": 72, "y": -18, "size": 37},
-        "ball2": {"x": 84, "y": 25, "size": 19},
+        "title": "商材別に抽出・集計",
+        "source_label": "データソース",
+        "sources": ["Cros 受注一", "Cros 受注二"],
+        "products": ["コラーゲン", "プラセンタ", "ナイトコラーゲン", "QQ", "もっちり", "⋮", "CRM売上"],
+        "note": "Taboola売上<br>CC数を補完",
+        "result_label": "各商材の日報へ自動入力",
+        "image": image_source("slide4.png"),
+        "ball1": {"x": 108, "y": 108, "size": 22},
+        "ball2": {"x": -6, "y": -8, "size": 13},
     },
     {
         "type": "section",
@@ -356,6 +356,184 @@ HTML = r"""
     border-radius: 50%;
     background: #9765eb;
     box-shadow: 0 0 0 5px rgba(151,101,235,.11);
+  }
+
+  /* Fourth page: data pipeline */
+  .pipeline-layout {
+    position: absolute;
+    inset: 0;
+    color: #493343;
+  }
+  .pipeline-title {
+    position: absolute;
+    left: 5.5%;
+    top: 5.8%;
+    margin: 0;
+    color: #402b3b;
+    font-size: clamp(24px, 3.25vw, 44px);
+    font-weight: 900;
+    letter-spacing: .015em;
+  }
+  .pipeline-flow {
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    top: 18%;
+    height: 62%;
+    display: grid;
+    grid-template-columns: 18% 8% 24% 15% 7% 28%;
+    align-items: center;
+  }
+  .pipeline-source {
+    align-self: stretch;
+    padding-top: 4%;
+  }
+  .pipeline-label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 35px;
+    padding: 7px 13px;
+    color: white;
+    background: linear-gradient(135deg, #a66f9b, #8f5a85);
+    font-size: clamp(11px, 1.25vw, 17px);
+    font-weight: 850;
+    letter-spacing: .04em;
+  }
+  .source-stack {
+    position: relative;
+    display: grid;
+    gap: 24%;
+    margin-top: 21%;
+  }
+  .source-stack::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 49%;
+    top: 38%;
+    width: 2px;
+    height: 35%;
+    background: #a36890;
+  }
+  .source-box {
+    padding: 9px 12px;
+    border: 1.5px solid #ef7b42;
+    background: linear-gradient(135deg, rgba(255,220,206,.82), rgba(250,177,148,.78));
+    color: #49343d;
+    font-size: clamp(10px, 1.15vw, 16px);
+  }
+  .flow-arrow {
+    position: relative;
+    width: 72%;
+    height: 20px;
+    justify-self: center;
+    background: linear-gradient(90deg, #d94768, #ee5b76);
+    filter: drop-shadow(0 2px 2px rgba(85,28,57,.15));
+  }
+  .flow-arrow::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -18px;
+    transform: translateY(-50%);
+    border-top: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 20px solid #ee5b76;
+  }
+  .pipeline-products {
+    align-self: stretch;
+    padding: 3% 8% 5%;
+    border: 2px solid #44a82e;
+    background: rgba(255,255,255,.16);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .product-item {
+    color: #49343e;
+    font-size: clamp(11px, 1.35vw, 19px);
+    line-height: 1.15;
+  }
+  .pipeline-note {
+    position: relative;
+    justify-self: center;
+    color: #573b4b;
+    font-size: clamp(10px, 1.05vw, 15px);
+    line-height: 1.45;
+  }
+  .pipeline-note::before,
+  .pipeline-note::after {
+    content: "";
+    position: absolute;
+    right: 105%;
+    width: 65%;
+    height: 2px;
+    transform-origin: right center;
+    background: #9f648a;
+  }
+  .pipeline-note::before { top: 38%; transform: rotate(-23deg); }
+  .pipeline-note::after { top: 60%; transform: rotate(-8deg); }
+  .pipeline-result {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1%;
+  }
+  .result-label {
+    width: 100%;
+    padding: 8px 10px;
+    color: white;
+    background: linear-gradient(135deg, #9f658d, #885176);
+    text-align: center;
+    font-size: clamp(10px, 1.15vw, 16px);
+    font-weight: 850;
+  }
+  .result-image {
+    display: block;
+    width: 88%;
+    height: 69%;
+    margin-top: 6%;
+    object-fit: contain;
+    filter: drop-shadow(10px 14px 11px rgba(46,29,48,.25));
+  }
+  .etl-bracket {
+    position: absolute;
+    left: 9%;
+    bottom: 9%;
+    width: 36%;
+    height: 8%;
+    border-bottom: 2px solid #9e648a;
+    border-left: 2px solid #9e648a;
+    border-right: 2px solid #9e648a;
+    border-radius: 0 0 12px 12px;
+  }
+  .etl-label {
+    position: absolute;
+    left: 12%;
+    bottom: 4.5%;
+    color: #563b4d;
+    font-size: clamp(11px, 1.25vw, 17px);
+    letter-spacing: .04em;
+  }
+  .pipeline-brace {
+    position: absolute;
+    left: 4%;
+    right: 4%;
+    bottom: 1.8%;
+    height: 5.5%;
+    border-top: 2px solid #9e648a;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  }
+  .pipeline-name {
+    position: absolute;
+    left: 50%;
+    bottom: .4%;
+    transform: translateX(-50%);
+    color: #3e2939;
+    font-size: clamp(14px, 1.8vw, 25px);
+    font-weight: 900;
+    letter-spacing: .025em;
   }
 
   /* Third page: layered experience images */
@@ -674,6 +852,37 @@ HTML = r"""
       </div>`;
   }
 
+  function pipelineMarkup(s) {
+    const sources = s.sources.map(source =>
+      `<div class="source-box">${escapeText(source)}</div>`
+    ).join('');
+    const products = s.products.map(product =>
+      `<div class="product-item">${escapeText(product)}</div>`
+    ).join('');
+    return `
+      <div class="pipeline-layout">
+        <h1 class="pipeline-title">${escapeText(s.title)}</h1>
+        <div class="pipeline-flow">
+          <div class="pipeline-source">
+            <div class="pipeline-label">${escapeText(s.source_label)}</div>
+            <div class="source-stack">${sources}</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="pipeline-products">${products}</div>
+          <div class="pipeline-note">${s.note}</div>
+          <div class="flow-arrow"></div>
+          <div class="pipeline-result">
+            <div class="result-label">${escapeText(s.result_label)}</div>
+            <img class="result-image" src="${s.image}" alt="商材別の日報への自動入力結果">
+          </div>
+        </div>
+        <div class="etl-bracket"></div>
+        <div class="etl-label">ETL（Extract / Transform / Load）</div>
+        <div class="pipeline-brace"></div>
+        <div class="pipeline-name">Data Pipeline</div>
+      </div>`;
+  }
+
   function experienceMarkup(s) {
     const project = s.images.find(image => image.id === 'project');
     const four = s.images.find(image => image.id === 'four');
@@ -704,7 +913,7 @@ HTML = r"""
         </figure>
         <aside class="experience-card experience-summary" data-reveal="4">
           <div class="summary-content">
-            <div class="summary-kicker"></div>
+            <div class="summary-kicker">KEY TAKEAWAY</div>
             <p class="summary-text">画像もデータも、AI学習に活用できる<br>「品質・規格・量」を確保することがポイントです。</p>
           </div>
         </aside>
@@ -715,6 +924,7 @@ HTML = r"""
     if (s.type === 'title') return titleMarkup(s);
     if (s.type === 'toc') return tocMarkup(s);
     if (s.type === 'experience') return experienceMarkup(s);
+    if (s.type === 'pipeline') return pipelineMarkup(s);
     return sectionMarkup(s);
   }
 

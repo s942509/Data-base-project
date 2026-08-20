@@ -140,6 +140,14 @@ SLIDES = [
         "ball1": {"x": 114, "y": 110, "size": 18},
         "ball2": {"x": -14, "y": -12, "size": 13},
     },
+    {
+        "type": "image_slide",
+        "num": "10",
+        "title": "データベース構築の提案",
+        "image": image_source("slide12.png"),
+        "ball1": {"x": 116, "y": 112, "size": 18},
+        "ball2": {"x": -16, "y": -14, "size": 13},
+    },
 ]
 
 

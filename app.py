@@ -124,6 +124,14 @@ SLIDES = [
         "ball1": {"x": 70, "y": 62, "size": 43},
         "ball2": {"x": 50, "y": 76, "size": 21},
     },
+    {
+        "type": "image_slide",
+        "num": "08",
+        "title": "請求業務では、同じ項目を複数のシートへ繰り返し入力",
+        "image": image_source("slide10.png"),
+        "ball1": {"x": 116, "y": 112, "size": 18},
+        "ball2": {"x": -16, "y": -14, "size": 13},
+    },
 ]
 
 

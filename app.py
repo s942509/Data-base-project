@@ -85,14 +85,10 @@ SLIDES = [
         "ball2": {"x": -6, "y": -8, "size": 13},
     },
     {
-        "type": "section",
+        "type": "image_slide",
         "num": "03",
         "title": "現在の三つの課題",
-        "points": [
-            "（ここに内容を記載）",
-            "（ここに内容を記載）",
-            "（ここに内容を記載）",
-        ],
+        "image": image_source("slide5.png"),
         "ball1": {"x": -12, "y": 50, "size": 39},
         "ball2": {"x": 21, "y": 9, "size": 18},
     },

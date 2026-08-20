@@ -191,7 +191,7 @@ SLIDES = [
         "title": "整理されたデータが、運用できる分析とAI活用につながる",
         "points": [
             "条件を変えて繰り返し使える分析ツール",
-            "部門別のリアルタイムDashboard",
+            "部署別のリアルタイムDashboard",
             "データを検索できるAIエージェント",
         ],
         "tool_image": image_source("tool.png"),

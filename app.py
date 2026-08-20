@@ -266,7 +266,7 @@ HTML = r"""
     margin: 0;
     color: #6625d1;
     font-size: clamp(24px, 4vw, 55px);
-    font-weight: 400;
+    font-weight: 900;
     line-height: 1.22;
     letter-spacing: .01em;
   }
@@ -359,7 +359,7 @@ HTML = r"""
     margin: 0;
     color: #51358f;
     font-size: clamp(26px, 3.7vw, 52px);
-    font-weight: 900;
+    font-weight: 500;
     line-height: 1.48;
     letter-spacing: .015em;
     text-shadow: 0 2px 0 rgba(255,255,255,.72);

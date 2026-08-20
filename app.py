@@ -704,7 +704,7 @@ HTML = r"""
         </figure>
         <aside class="experience-card experience-summary" data-reveal="4">
           <div class="summary-content">
-            <div class="summary-kicker">KEY TAKEAWAY</div>
+            <div class="summary-kicker"></div>
             <p class="summary-text">画像もデータも、AI学習に活用できる<br>「品質・規格・量」を確保することがポイントです。</p>
           </div>
         </aside>

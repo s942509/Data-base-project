@@ -96,8 +96,7 @@ SLIDES = [
         "type": "morph_slide",
         "num": "04",
         "title": "Shopline APIでの自動化",
-        "image": image_source("slide6.png"),
-        "arrow": image_source("slide6_arrow.png"),
+        "image": image_source("slide6_noarror.png"),
         "ball1": {"x": 59, "y": 61, "size": 18},
         "ball2": {"x": 59, "y": 61, "size": 13},
     },
@@ -415,52 +414,94 @@ HTML = r"""
     object-position: center;
     background: transparent;
   }
-  .morph-arrow {
+  .merge-ball {
     position: absolute;
-    z-index: 8;
-    left: 59%;
-    top: 61%;
-    width: 27%;
-    height: 18%;
-    object-fit: contain;
-    transform-origin: 20% 50%;
+    z-index: 9;
+    left: var(--start-x);
+    top: var(--start-y);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    will-change: left, top, width, height, border-radius, opacity, transform;
+  }
+  .merge-ball-main {
+    --start-x: 46%;
+    --start-y: 49%;
+    width: 14%;
+    aspect-ratio: 1;
+    background: radial-gradient(circle at 29% 24%,
+      #fff 0%, #e6d8ff 11%, #c3a1f7 32%, #9560ed 64%, #6427c9 100%);
+    box-shadow:
+      inset -2.2vw -2.4vw 4vw rgba(52,14,127,.25),
+      inset 1.3vw 1.1vw 2.6vw rgba(255,255,255,.28),
+      0 1.5vw 3.2vw rgba(92,39,188,.20);
+  }
+  .merge-ball-main::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -29%;
+    top: 50%;
+    width: 34%;
+    height: 190%;
+    background: linear-gradient(135deg, #9d68ea, #7135de);
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+    transform: translateY(-50%) scale(0);
+    transform-origin: left center;
     opacity: 0;
-    filter: blur(8px) saturate(115%);
   }
-  .morph-arrow.play {
-    animation: arrowMorph 820ms cubic-bezier(.22,.9,.32,1) 260ms both;
+  .merge-ball-secondary {
+    --start-x: 73%;
+    --start-y: 74%;
+    width: 20%;
+    aspect-ratio: 1;
+    opacity: .70;
+    background: radial-gradient(circle at 30% 24%,
+      #fff 0%, #eee6ff 14%, #d1bafa 39%, #ad82ed 70%, #8350d5 100%);
+    box-shadow: inset -2vw -2.2vw 4vw rgba(55,17,130,.18);
   }
-  @keyframes arrowMorph {
+  .merge-ball-main.play {
+    animation: mainBallToArrow 2.05s cubic-bezier(.22,.82,.28,1) both;
+  }
+  .merge-ball-main.play::after {
+    animation: arrowHeadGrow .70s cubic-bezier(.22,.9,.32,1) 1.28s both;
+  }
+  .merge-ball-secondary.play {
+    animation: secondaryBallMerge 1.32s cubic-bezier(.22,.82,.28,1) both;
+  }
+  @keyframes mainBallToArrow {
     0% {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(.18, .72);
-      filter: blur(9px) saturate(125%);
+      left: 46%; top: 49%; width: 14%; height: 24.9%;
+      aspect-ratio: auto; border-radius: 50%; opacity: .94;
     }
-    42% {
-      opacity: .92;
-      transform: translate(-50%, -50%) scale(.38, .88);
-      filter: blur(3px) saturate(120%);
+    52% {
+      left: 59%; top: 61%; width: 14%; height: 24.9%;
+      aspect-ratio: auto; border-radius: 50%; opacity: .96;
     }
-    78% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1.05, 1.03);
-      filter: blur(0) saturate(108%);
+    64% {
+      left: 59%; top: 61%; width: 14%; height: 13%;
+      aspect-ratio: auto; border-radius: 999px; opacity: 1;
+    }
+    86% {
+      left: 59%; top: 61%; width: 22%; height: 8%;
+      aspect-ratio: auto; border-radius: 999px 18px 18px 999px; opacity: 1;
     }
     100% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-      filter: blur(0) saturate(100%);
+      left: 59%; top: 61%; width: 23%; height: 8%;
+      aspect-ratio: auto; border-radius: 999px 12px 12px 999px; opacity: 1;
     }
   }
-  .stage.hide-orbs .orb {
+  @keyframes secondaryBallMerge {
+    0% { left: 73%; top: 74%; width: 20%; opacity: .70; transform: translate(-50%,-50%) scale(1); }
+    72% { left: 59%; top: 61%; width: 14%; opacity: .62; transform: translate(-50%,-50%) scale(.92); }
+    100% { left: 59%; top: 61%; width: 8%; opacity: 0; transform: translate(-50%,-50%) scale(.20); }
+  }
+  @keyframes arrowHeadGrow {
+    from { opacity: 0; transform: translateY(-50%) scale(.05); }
+    to { opacity: 1; transform: translateY(-50%) scale(1); }
+  }
+  .stage.morph-active > .orb {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(.28);
-    transition:
-      left 900ms cubic-bezier(.65,0,.25,1),
-      top 900ms cubic-bezier(.65,0,.25,1),
-      width 900ms cubic-bezier(.65,0,.25,1),
-      opacity 300ms ease,
-      transform 360ms cubic-bezier(.4,0,.2,1);
+    transition: opacity 220ms ease;
   }
 
   /* Legacy pipeline rules are unused; retained only for CSS compatibility. */
@@ -1006,7 +1047,8 @@ HTML = r"""
         <figure class="morph-slide-figure">
           <img class="morph-base-image" src="${s.image}" alt="Shopline APIでの自動化">
         </figure>
-        <img class="morph-arrow" id="morphArrow" src="${s.arrow}" alt="ETLから日報への矢印">
+        <div class="merge-ball merge-ball-main" id="mergeBallMain" aria-hidden="true"></div>
+        <div class="merge-ball merge-ball-secondary" id="mergeBallSecondary" aria-hidden="true"></div>
       </div>`;
   }
 
@@ -1057,12 +1099,16 @@ HTML = r"""
   }
 
   function runSlideEffect() {
-    stage.classList.remove('hide-orbs');
+    stage.classList.remove('morph-active');
     if (slides[index].type !== 'morph_slide') return;
-    const arrow = document.getElementById('morphArrow');
-    if (!arrow) return;
-    requestAnimationFrame(() => arrow.classList.add('play'));
-    setTimeout(() => stage.classList.add('hide-orbs'), 270);
+    const mainBall = document.getElementById('mergeBallMain');
+    const secondaryBall = document.getElementById('mergeBallSecondary');
+    if (!mainBall || !secondaryBall) return;
+    stage.classList.add('morph-active');
+    requestAnimationFrame(() => {
+      mainBall.classList.add('play');
+      secondaryBall.classList.add('play');
+    });
   }
 
   function updateExperience() {
@@ -1106,7 +1152,7 @@ HTML = r"""
     if (busy || nextIndex === index) return;
     busy = true;
 
-    stage.classList.remove('hide-orbs');
+    stage.classList.remove('morph-active');
 
     content.classList.remove('in');
     content.classList.add('out');

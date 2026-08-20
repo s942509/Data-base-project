@@ -387,11 +387,11 @@ HTML = r"""
     position: absolute;
     z-index: 6;
     margin: 0;
-    overflow: hidden;
-    border: 1px solid rgba(45, 29, 57, .78);
-    border-radius: clamp(7px, .8vw, 13px);
-    background: #fff;
-    box-shadow: 0 9px 24px rgba(33, 20, 48, .25);
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
     opacity: 0;
     transform: translateY(18px) scale(.965);
     filter: blur(3px);
@@ -410,7 +410,7 @@ HTML = r"""
     width: 100%;
     height: 100%;
     object-fit: contain;
-    background: #fff;
+    background: transparent;
   }
   .experience-project {
     z-index: 5;

@@ -93,12 +93,13 @@ SLIDES = [
         "ball2": {"x": 21, "y": 9, "size": 18},
     },
     {
-        "type": "image_slide",
+        "type": "morph_slide",
         "num": "04",
         "title": "Shopline APIでの自動化",
         "image": image_source("slide6.png"),
-        "ball1": {"x": 69, "y": 65, "size": 42},
-        "ball2": {"x": 55, "y": 50, "size": 20},
+        "arrow": image_source("slide6_arrow.png"),
+        "ball1": {"x": 59, "y": 61, "size": 18},
+        "ball2": {"x": 59, "y": 61, "size": 13},
     },
     {
         "type": "section",
@@ -390,6 +391,76 @@ HTML = r"""
     object-fit: contain;
     object-position: center;
     background: transparent;
+  }
+
+  /* Sixth page: the two guide orbs merge and become the flow arrow. */
+  .morph-slide-layout {
+    position: absolute;
+    inset: 0;
+  }
+  .morph-slide-figure {
+    position: absolute;
+    z-index: 5;
+    left: 4.5%;
+    right: 4.5%;
+    top: 17%;
+    bottom: 8%;
+    margin: 0;
+  }
+  .morph-base-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+    background: transparent;
+  }
+  .morph-arrow {
+    position: absolute;
+    z-index: 8;
+    left: 59%;
+    top: 61%;
+    width: 27%;
+    height: 18%;
+    object-fit: contain;
+    transform-origin: 20% 50%;
+    opacity: 0;
+    filter: blur(8px) saturate(115%);
+  }
+  .morph-arrow.play {
+    animation: arrowMorph 820ms cubic-bezier(.22,.9,.32,1) 260ms both;
+  }
+  @keyframes arrowMorph {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(.18, .72);
+      filter: blur(9px) saturate(125%);
+    }
+    42% {
+      opacity: .92;
+      transform: translate(-50%, -50%) scale(.38, .88);
+      filter: blur(3px) saturate(120%);
+    }
+    78% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.05, 1.03);
+      filter: blur(0) saturate(108%);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      filter: blur(0) saturate(100%);
+    }
+  }
+  .stage.hide-orbs .orb {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.28);
+    transition:
+      left 900ms cubic-bezier(.65,0,.25,1),
+      top 900ms cubic-bezier(.65,0,.25,1),
+      width 900ms cubic-bezier(.65,0,.25,1),
+      opacity 300ms ease,
+      transform 360ms cubic-bezier(.4,0,.2,1);
   }
 
   /* Legacy pipeline rules are unused; retained only for CSS compatibility. */
@@ -928,6 +999,17 @@ HTML = r"""
       </div>`;
   }
 
+  function morphSlideMarkup(s) {
+    return `
+      <div class="morph-slide-layout">
+        <h1 class="image-slide-title">${escapeText(s.title)}</h1>
+        <figure class="morph-slide-figure">
+          <img class="morph-base-image" src="${s.image}" alt="Shopline APIでの自動化">
+        </figure>
+        <img class="morph-arrow" id="morphArrow" src="${s.arrow}" alt="ETLから日報への矢印">
+      </div>`;
+  }
+
   function experienceMarkup(s) {
     const project = s.images.find(image => image.id === 'project');
     const four = s.images.find(image => image.id === 'four');
@@ -970,7 +1052,17 @@ HTML = r"""
     if (s.type === 'toc') return tocMarkup(s);
     if (s.type === 'experience') return experienceMarkup(s);
     if (s.type === 'image_slide') return imageSlideMarkup(s);
+    if (s.type === 'morph_slide') return morphSlideMarkup(s);
     return sectionMarkup(s);
+  }
+
+  function runSlideEffect() {
+    stage.classList.remove('hide-orbs');
+    if (slides[index].type !== 'morph_slide') return;
+    const arrow = document.getElementById('morphArrow');
+    if (!arrow) return;
+    requestAnimationFrame(() => arrow.classList.add('play'));
+    setTimeout(() => stage.classList.add('hide-orbs'), 270);
   }
 
   function updateExperience() {
@@ -1007,11 +1099,14 @@ HTML = r"""
     content.innerHTML = markup(s);
     content.classList.add('in');
     drawHud();
+    runSlideEffect();
   }
 
   function moveTo(nextIndex) {
     if (busy || nextIndex === index) return;
     busy = true;
+
+    stage.classList.remove('hide-orbs');
 
     content.classList.remove('in');
     content.classList.add('out');
@@ -1030,6 +1125,7 @@ HTML = r"""
       void content.offsetWidth;
       content.classList.add('in');
       drawHud();
+      runSlideEffect();
       busy = false;
     }, 1020);
   }

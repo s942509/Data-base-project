@@ -20,7 +20,7 @@ def image_source(filename):
 
 
 st.set_page_config(
-    page_title="データ基盤構築の考え方と業務自動化",
+    page_title="データ基盤構築の概念と業務自動化",
     page_icon="🟣",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -1488,7 +1488,7 @@ HTML = r"""
     const summary = s.summary ? `
       <aside class="experience-card experience-summary image-summary" data-summary="1">
         <div class="summary-content">
-          <div class="summary-kicker">KEY TAKEAWAY</div>
+          <div class="summary-kicker">  </div>
           <p class="summary-text">${escapeText(s.summary)}</p>
         </div>
       </aside>` : '';

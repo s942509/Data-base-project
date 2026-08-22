@@ -31,7 +31,7 @@ SLIDES = [
     {
         "type": "title",
         "eyebrow": "DATA PLATFORM / AUTOMATION",
-        "title": "データ基盤構築の考え方と<br>業務自動化",
+        "title": "データ基盤構築の概念と<br>業務自動化",
         "reporter": "Reporter: 佳蓁（カシン）",
         "date": "2026/08/24",
         "ball1": {"x": 74, "y": 73, "size": 45},

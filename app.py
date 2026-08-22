@@ -87,7 +87,7 @@ SLIDES = [
     {
         "type": "image_slide",
         "num": "03",
-        "title": "現在の三つの課題",
+        "title": "媒体数字抽出",
         "image": image_source("slide5.png"),
         "ball1": {"x": -12, "y": 50, "size": 39},
         "ball2": {"x": 21, "y": 9, "size": 18},
@@ -111,7 +111,7 @@ SLIDES = [
     {
         "type": "reveal_image",
         "num": "06",
-        "title": "個別作業とシステム間の分断を、同時に改善",
+        "title": "個別作業とシステム間の分断を、同時に改善（点→線→面）",
         "image": image_source("slide8.png"),
         "overlay": image_source("slide8_py.png"),
         "ball1": {"x": 114, "y": 110, "size": 18},
@@ -144,7 +144,7 @@ SLIDES = [
         "type": "image_slide",
         "num": "10",
         "title": "データベース構築の提案",
-        "image": image_source("slide12.png"),
+        "image": image_source("slide12_2.png"),
         "ball1": {"x": 116, "y": 112, "size": 18},
         "ball2": {"x": -16, "y": -14, "size": 13},
     },
@@ -503,10 +503,11 @@ HTML = r"""
     max-width: 94%;
     margin: 0;
     color: #4b3150;
-    font-size: clamp(22px, 2.75vw, 39px);
+    font-size: clamp(18px, 2.2vw, 32px);
     font-weight: 900;
     line-height: 1.3;
     letter-spacing: .012em;
+    white-space: nowrap;
   }
   .topic-subtitle {
     margin: 4.5% 0 0 10.5%;
@@ -564,19 +565,20 @@ HTML = r"""
     position: absolute;
     z-index: 8;
     left: 50%;
-    bottom: 7%;
+    bottom: 12%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 26px;
     color: #5d3aa5;
-    font-size: clamp(15px, 1.7vw, 24px);
+    font-size: clamp(20px, 2.2vw, 32px);
     font-weight: 900;
     white-space: nowrap;
   }
   .summary-arrow {
-    width: clamp(75px, 8vw, 116px);
-    height: clamp(30px, 3.1vw, 44px);
+    width: clamp(110px, 11vw, 165px);
+    height: clamp(42px, 4.3vw, 62px);
+    flex-shrink: 0;
     background: linear-gradient(90deg, #7c3aed, #a977ec);
     clip-path: polygon(0 22%, 68% 22%, 68% 0, 100% 50%, 68% 100%, 68% 78%, 0 78%);
     filter: drop-shadow(0 7px 10px rgba(84,38,163,.2));
@@ -585,13 +587,13 @@ HTML = r"""
   .ai-tools-layout { position: absolute; inset: 0; padding: 5.6% 5.5%; }
   .ai-tools-title {
     position: relative; z-index: 8; width: 88%; margin: 0;
-    color: #4b3150; font-size: clamp(23px, 2.85vw, 40px);
+    color: #4b3150; font-size: clamp(25px, 3.05vw, 43px);
     font-weight: 900; line-height: 1.3;
   }
   .ai-tools-points {
-    position: absolute; z-index: 8; left: 6%; top: 25%; width: 37%;
+    position: absolute; z-index: 8; left: 6%; top: 25%; width: 42%;
     margin: 0; padding-left: 1.5em; color: #554164;
-    font-size: clamp(12px, 1.35vw, 19px); line-height: 1.85;
+    font-size: clamp(17px, 2vw, 28px); line-height: 1.9;
   }
   .ai-tool-image, .ai-agent-image {
     position: absolute; z-index: 7; display: block; object-fit: contain;
@@ -632,8 +634,7 @@ HTML = r"""
     color: #9b6be8; font-size: clamp(24px, 3vw, 42px); font-weight: 900;
   }
   .steps-status {
-    position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%);
-    color: #8c6ac9; font-size: clamp(9px, .9vw, 13px); font-weight: 850; letter-spacing: .14em;
+    display: none;
   }
 
   .full-image-layout { position: absolute; inset: 0; padding: 4.5%; }
@@ -651,9 +652,10 @@ HTML = r"""
     top: 6.5%;
     margin: 0;
     color: #4b3150;
-    font-size: clamp(23px, 3vw, 42px);
+    font-size: clamp(20px, 2.55vw, 36px);
     font-weight: 900;
     letter-spacing: .015em;
+    white-space: nowrap;
   }
   .image-slide-title::after {
     content: "";
@@ -1272,29 +1274,37 @@ HTML = r"""
     align-items: center;
     pointer-events: none;
   }
-  .progress { display: flex; gap: 7px; }
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(106,67,178,.20); transition: width .3s, background .3s; }
-  .dot.active { width: 24px; border-radius: 8px; background: #8b5cf6; }
-  .counter { color: #8f72d0; font-size: clamp(9px, .9vw, 13px); font-weight: 800; letter-spacing: .14em; }
-
-  .next-hint {
-    position: absolute;
-    z-index: 12;
-    right: 3.4%; top: 4.8%;
+  .progress {
     display: flex;
     align-items: center;
-    gap: 9px;
-    border: 1px solid rgba(119,76,198,.18);
-    border-radius: 999px;
-    padding: 8px 13px;
-    color: #7651be;
-    background: rgba(255,255,255,.40);
-    backdrop-filter: blur(8px);
-    font-size: clamp(9px, .9vw, 13px);
-    font-weight: 800;
-    letter-spacing: .1em;
-    pointer-events: none;
+    gap: clamp(2px, .28vw, 5px);
+    pointer-events: auto;
   }
+  .page-jump {
+    appearance: none;
+    min-width: clamp(15px, 1.4vw, 21px);
+    height: clamp(15px, 1.4vw, 21px);
+    padding: 0 2px;
+    border: 0;
+    border-radius: 6px;
+    color: rgba(101, 72, 153, .58);
+    background: transparent;
+    font-size: clamp(7px, .65vw, 10px);
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    transition: color .2s ease, background .2s ease, transform .2s ease;
+  }
+  .page-jump:hover {
+    color: #7135de;
+    background: rgba(139,92,246,.12);
+    transform: translateY(-1px);
+  }
+  .page-jump.active {
+    color: white;
+    background: #8b5cf6;
+  }
+  .counter { color: #8f72d0; font-size: clamp(9px, .9vw, 13px); font-weight: 800; letter-spacing: .14em; }
 
   .ripple {
     position: absolute;
@@ -1312,7 +1322,7 @@ HTML = r"""
     .toc-row { grid-template-columns: 30px 1fr; }
     .points li { padding-left: 13px; }
     .points li::before { width: 5px; height: 5px; box-shadow: none; }
-    .next-hint { padding: 5px 8px; }
+    .progress { gap: 1px; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1332,7 +1342,6 @@ HTML = r"""
       <div class="orb orb-a" id="orbA"></div>
       <div class="orb orb-b" id="orbB"></div>
       <section class="content" id="content"></section>
-      <div class="next-hint" id="nextHint">CLICK <span>→</span></div>
       <div class="hud">
         <div class="progress" id="progress"></div>
         <div class="counter" id="counter"></div>
@@ -1348,7 +1357,6 @@ HTML = r"""
   const orbB = document.getElementById('orbB');
   const progress = document.getElementById('progress');
   const counter = document.getElementById('counter');
-  const nextHint = document.getElementById('nextHint');
 
   let index = 0;
   let busy = false;
@@ -1465,7 +1473,6 @@ HTML = r"""
       <div class="steps-layout">
         <h1 class="steps-title">${escapeText(s.title)}</h1>
         <div class="steps-row">${cards}</div>
-        <div class="steps-status" id="stepsStatus">CLICK TO REVEAL · 0 / 3</div>
       </div>`;
   }
 
@@ -1539,7 +1546,6 @@ HTML = r"""
           </defs>
         </svg>
         <h1 class="experience-title">${escapeText(s.title)}</h1>
-        <div class="experience-step" id="experienceStep">CLICK TO REVEAL · 0 / 4</div>
         <figure class="experience-card experience-project" data-reveal="1">
           <img src="${project.url}" alt="${escapeText(project.alt)}">
         </figure>
@@ -1551,7 +1557,6 @@ HTML = r"""
         </figure>
         <aside class="experience-card experience-summary" data-reveal="4">
           <div class="summary-content">
-            <div class="summary-kicker">KEY TAKEAWAY</div>
             <p class="summary-text">画像もデータも、AI学習に活用できる<br>「品質・規格・量」を確保することがポイントです。</p>
           </div>
         </aside>
@@ -1593,12 +1598,6 @@ HTML = r"""
       const step = Number(card.dataset.reveal);
       card.classList.toggle('shown', step <= revealStep);
     });
-    const label = document.getElementById('experienceStep');
-    if (label) {
-      label.textContent = revealStep < 4
-        ? `CLICK TO REVEAL · ${revealStep} / 4`
-        : 'KEY TAKEAWAY · 4 / 4';
-    }
     drawHud();
   }
 
@@ -1621,29 +1620,14 @@ HTML = r"""
     content.querySelectorAll('[data-step]').forEach(card => {
       card.classList.toggle('shown', Number(card.dataset.step) <= revealStep);
     });
-    const label = document.getElementById('stepsStatus');
-    if (label) label.textContent = revealStep < 3
-      ? `CLICK TO REVEAL · ${revealStep} / 3`
-      : 'READY TO EXPAND · 3 / 3';
     drawHud();
   }
 
   function drawHud() {
     progress.innerHTML = slides.map((_, i) =>
-      `<span class="dot ${i === index ? 'active' : ''}"></span>`
+      `<button class="page-jump ${i === index ? 'active' : ''}" type="button" data-page="${i}" aria-label="${i + 1}ページへ移動">${i + 1}</button>`
     ).join('');
     counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
-    if (slides[index].type === 'experience' && revealStep < 4) {
-      nextHint.innerHTML = `REVEAL ${revealStep + 1} / 4 <span>＋</span>`;
-    } else if (slides[index].summary && revealStep < 1) {
-      nextHint.innerHTML = 'SUMMARY <span>＋</span>';
-    } else if (slides[index].type === 'reveal_image' && revealStep < 1) {
-      nextHint.innerHTML = 'PYTHON <span>＋</span>';
-    } else if (slides[index].type === 'steps' && revealStep < 3) {
-      nextHint.innerHTML = `STEP ${revealStep + 1} / 3 <span>＋</span>`;
-    } else {
-      nextHint.innerHTML = index === slides.length - 1 ? 'RESTART <span>↻</span>' : 'CLICK <span>→</span>';
-    }
   }
 
   function showInitial() {
@@ -1736,6 +1720,15 @@ HTML = r"""
 
   stage.addEventListener('pointerdown', () => {
     stage.focus({preventScroll: true});
+  });
+
+  progress.addEventListener('click', event => {
+    const button = event.target.closest('[data-page]');
+    if (!button) return;
+    event.preventDefault();
+    event.stopPropagation();
+    stage.focus({preventScroll: true});
+    moveTo(Number(button.dataset.page));
   });
 
   stage.addEventListener('click', event => {

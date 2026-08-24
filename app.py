@@ -207,7 +207,6 @@ SLIDES = [
         "type": "ai_tools",
         "num": "15",
         "title": "整理されたデータが、運用できる分析とAI活用につながる",
-        "title_link": "https://www.smebiz.org.tw/project-tenacity_shop.php",
         "quick_links": [
             {"label": "dashboard1", "url": "https://uberairport-tgc7klm9fjx97egr67ghtw.streamlit.app/"},
             {"label": "dashboard2", "url": "https://tvirusoutbreak-qgwkumvtvibqdxr4pwsqbr.streamlit.app/"},
@@ -255,6 +254,7 @@ SLIDES = [
         "type": "image_slide",
         "num": "19",
         "title": "業界における取り組み事例",
+        "title_link": "https://www.smebiz.org.tw/project-tenacity_shop.php",
         "subtitles": [
             "カスタムデータ基盤の構築",
             "社内AIエージェントの構築",
@@ -542,7 +542,7 @@ HTML = r"""
     line-height: 1.5;
   }
   .topic-image {
-    position: absolute; left: 12%; right: 12%; bottom: 6%; width: 76%; height: 48%;
+    position: absolute; left: 6%; top: 22%; width: 88%; height: 73%;
     object-fit: contain; filter: drop-shadow(0 12px 22px rgba(47,27,78,.15));
   }
   .topic-subtitle::before {
@@ -622,14 +622,16 @@ HTML = r"""
   .inline-link { color: #7135de; text-decoration: none; pointer-events: auto; }
   .inline-link:hover { text-decoration: underline; }
   .quick-links {
-    position: absolute; z-index: 12; left: 7.5%; top: 17.5%;
-    display: flex; gap: .7vw; pointer-events: auto;
+    position: absolute; z-index: 12; left: 7%; top: 20%;
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: .42vw; pointer-events: auto;
   }
   .quick-link {
     padding: .42em .85em; border: 1px solid rgba(113,53,222,.3); border-radius: 999px;
     color: #6534b4; background: rgba(255,255,255,.72); text-decoration: none;
     font-size: clamp(9px, .95vw, 14px); font-weight: 800;
   }
+  .ai-tools-layout.has-quick-links .ai-tools-points { left: 20%; top: 25%; width: 35%; }
   .quick-link:hover { color: white; background: #7135de; }
   .ai-tools-points {
     position: absolute; z-index: 8; left: 6%; top: 25%; width: 42%;
@@ -713,12 +715,13 @@ HTML = r"""
     pointer-events: auto;
   }
   .slide-note {
-    position: absolute; z-index: 9; right: 5%; top: 18%; width: 40%;
-    padding: 1.3em 1.5em; border: 1px solid rgba(139,92,246,.25); border-radius: 18px;
+    position: absolute; z-index: 9; right: 1.8%; top: 15.5%;
+    width: max-content; max-width: 39%;
+    padding: 1.05em 1.25em; border: 1px solid rgba(139,92,246,.25); border-radius: 18px;
     color: #4f3b69; background: rgba(255,255,255,.82); box-shadow: 0 12px 30px rgba(91,51,152,.12);
-    font-size: clamp(11px, 1.25vw, 18px); font-weight: 700; line-height: 1.65;
+    font-size: clamp(10px, 1.08vw, 16px); font-weight: 700; line-height: 1.55;
   }
-  .slide-note p { margin: .25em 0; }
+  .slide-note p { margin: .2em 0; white-space: nowrap; }
   .image-slide-subtitles {
     position: absolute;
     z-index: 8;
@@ -1516,7 +1519,7 @@ HTML = r"""
       ${s.quick_links.map(link => `<a class="quick-link" href="${link.url}" target="_blank" rel="noopener noreferrer">${escapeText(link.label)}</a>`).join('')}
     </nav>` : '';
     return `
-      <div class="ai-tools-layout">
+      <div class="ai-tools-layout${s.quick_links ? ' has-quick-links' : ''}">
         <h1 class="ai-tools-title">${escapeText(s.title)}${titleLink}</h1>
         ${quickLinks}
         <ul class="ai-tools-points">${points}</ul>
@@ -1544,6 +1547,9 @@ HTML = r"""
   }
 
   function imageSlideMarkup(s) {
+    const titleLink = s.title_link
+      ? ` <a class="inline-link" href="${s.title_link}" target="_blank" rel="noopener noreferrer">（連結）</a>`
+      : '';
     const subtitles = s.subtitles ? `
       <div class="image-slide-subtitles">
         ${s.subtitles.map(line => `<span>${escapeText(line)}</span>`).join('')}
@@ -1559,7 +1565,7 @@ HTML = r"""
     const note = s.note ? `<aside class="slide-note">${s.note.map(line => `<p>${escapeText(line)}</p>`).join('')}</aside>` : '';
     return `
       <div class="image-slide-layout">
-        <h1 class="image-slide-title">${escapeText(s.title)}</h1>
+        <h1 class="image-slide-title">${escapeText(s.title)}${titleLink}</h1>
         ${subtitles}
         <figure class="image-slide-figure">
           <img src="${s.image}" alt="日報更新の流れ">

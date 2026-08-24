@@ -19,6 +19,16 @@ def image_source(filename):
     return f"https://raw.githubusercontent.com/s942509/Data-base-project/main/{safe_name}"
 
 
+def video_source(filename):
+    """Use a repository video locally or from GitHub when deployed."""
+    path = Path(__file__).resolve().parent / filename
+    if path.exists():
+        encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+        return f"data:video/mp4;base64,{encoded}"
+    safe_name = filename.replace(" ", "%20")
+    return f"https://raw.githubusercontent.com/s942509/Data-base-project/main/{safe_name}"
+
+
 st.set_page_config(
     page_title="データ基盤構築の概念と業務自動化",
     page_icon="🟣",
@@ -56,6 +66,7 @@ SLIDES = [
         "type": "experience",
         "num": "01",
         "title": "医療ビッグデータ基盤構築の経験",
+        "title_link": "https://www.nchc.org.tw/Page?itemid=8&mid=12",
         "images": [
             {
                 "id": "project",
@@ -129,6 +140,7 @@ SLIDES = [
         "num": "08",
         "title": "請求業務では、同じ項目を複数のシートへ繰り返し入力",
         "image": image_source("slide10.png"),
+        "video": video_source("領収書自動反映.mp4"),
         "ball1": {"x": 116, "y": 112, "size": 18},
         "ball2": {"x": -16, "y": -14, "size": 13},
     },
@@ -145,6 +157,11 @@ SLIDES = [
         "num": "10",
         "title": "データベース構築の提案",
         "image": image_source("slide12_2.png"),
+        "note": [
+            "すべての表のデータを構造化したデータベースへ",
+            "管理しやすく、自動化もしやすい仕組みに",
+            "各部署での重複作業を減らす",
+        ],
         "ball1": {"x": 116, "y": 112, "size": 18},
         "ball2": {"x": -16, "y": -14, "size": 13},
     },
@@ -160,7 +177,8 @@ SLIDES = [
         "type": "topic",
         "num": "12",
         "title": "課題3｜名称と項目定義の不統一が、分析と自動連携を難しくする",
-        "subtitle": "広告パラメータのルールが不明確",
+        "subtitle": "広告パラメータのルールが不明確。もし2023年と2024年のもっちりの業績を知りたい場合、絞り込み条件が不明確で、後続の分析やAI導入で問題が起こりやすくなります。",
+        "image": image_source("2023_2024mocchiri.png"),
         "ball1": {"x": 113, "y": 105, "size": 18},
         "ball2": {"x": -14, "y": -12, "size": 13},
     },
@@ -189,6 +207,12 @@ SLIDES = [
         "type": "ai_tools",
         "num": "15",
         "title": "整理されたデータが、運用できる分析とAI活用につながる",
+        "title_link": "https://www.smebiz.org.tw/project-tenacity_shop.php",
+        "quick_links": [
+            {"label": "dashboard1", "url": "https://uberairport-tgc7klm9fjx97egr67ghtw.streamlit.app/"},
+            {"label": "dashboard2", "url": "https://tvirusoutbreak-qgwkumvtvibqdxr4pwsqbr.streamlit.app/"},
+            {"label": "AI agent", "url": "https://marketing-objectives-managementdashboard-mlxu3hfgu6pzpysxirvjm.streamlit.app/"},
+        ],
         "points": [
             "条件を変えて繰り返し使える分析ツール",
             "部門別のリアルタイムDashboard",
@@ -510,11 +534,16 @@ HTML = r"""
     white-space: nowrap;
   }
   .topic-subtitle {
-    margin: 4.5% 0 0 10.5%;
+    margin: 3.2% 0 0 6%;
+    max-width: 88%;
     color: #493744;
-    font-size: clamp(19px, 2.25vw, 32px);
+    font-size: clamp(13px, 1.45vw, 21px);
     font-weight: 500;
     line-height: 1.5;
+  }
+  .topic-image {
+    position: absolute; left: 12%; right: 12%; bottom: 6%; width: 76%; height: 48%;
+    object-fit: contain; filter: drop-shadow(0 12px 22px rgba(47,27,78,.15));
   }
   .topic-subtitle::before {
     content: "";
@@ -590,6 +619,18 @@ HTML = r"""
     color: #4b3150; font-size: clamp(25px, 3.05vw, 43px);
     font-weight: 900; line-height: 1.3;
   }
+  .inline-link { color: #7135de; text-decoration: none; pointer-events: auto; }
+  .inline-link:hover { text-decoration: underline; }
+  .quick-links {
+    position: absolute; z-index: 12; left: 7.5%; top: 17.5%;
+    display: flex; gap: .7vw; pointer-events: auto;
+  }
+  .quick-link {
+    padding: .42em .85em; border: 1px solid rgba(113,53,222,.3); border-radius: 999px;
+    color: #6534b4; background: rgba(255,255,255,.72); text-decoration: none;
+    font-size: clamp(9px, .95vw, 14px); font-weight: 800;
+  }
+  .quick-link:hover { color: white; background: #7135de; }
   .ai-tools-points {
     position: absolute; z-index: 8; left: 6%; top: 25%; width: 42%;
     margin: 0; padding-left: 1.5em; color: #554164;
@@ -666,6 +707,18 @@ HTML = r"""
     border-radius: 5px;
     background: linear-gradient(90deg, #7c3aed, #b78bea);
   }
+  .slide-video {
+    position: absolute; z-index: 9; right: 4.5%; bottom: 7%; width: 35%; max-height: 45%;
+    border-radius: 14px; background: #171220; box-shadow: 0 14px 32px rgba(30,13,61,.25);
+    pointer-events: auto;
+  }
+  .slide-note {
+    position: absolute; z-index: 9; right: 5%; top: 18%; width: 40%;
+    padding: 1.3em 1.5em; border: 1px solid rgba(139,92,246,.25); border-radius: 18px;
+    color: #4f3b69; background: rgba(255,255,255,.82); box-shadow: 0 12px 30px rgba(91,51,152,.12);
+    font-size: clamp(11px, 1.25vw, 18px); font-weight: 700; line-height: 1.65;
+  }
+  .slide-note p { margin: .25em 0; }
   .image-slide-subtitles {
     position: absolute;
     z-index: 8;
@@ -1106,6 +1159,7 @@ HTML = r"""
     border-radius: 8px;
     background: linear-gradient(90deg, #8b5cf6, #d0b9f7);
   }
+  .experience-title .inline-link { font-size: .55em; vertical-align: .12em; }
   .experience-card {
     position: absolute;
     z-index: 6;
@@ -1429,10 +1483,12 @@ HTML = r"""
   }
 
   function topicMarkup(s) {
+    const image = s.image ? `<img class="topic-image" src="${s.image}" alt="2023年と2024年のもっちり業績">` : '';
     return `
       <div class="topic-layout">
         <h1 class="topic-title">${escapeText(s.title)}</h1>
         <p class="topic-subtitle">${escapeText(s.subtitle)}</p>
+        ${image}
       </div>`;
   }
 
@@ -1453,9 +1509,16 @@ HTML = r"""
 
   function aiToolsMarkup(s) {
     const points = s.points.map(point => `<li>${escapeText(point)}</li>`).join('');
+    const titleLink = s.title_link
+      ? ` <a class="inline-link" href="${s.title_link}" target="_blank" rel="noopener noreferrer">（連結）</a>`
+      : '';
+    const quickLinks = s.quick_links ? `<nav class="quick-links" aria-label="クイックリンク">
+      ${s.quick_links.map(link => `<a class="quick-link" href="${link.url}" target="_blank" rel="noopener noreferrer">${escapeText(link.label)}</a>`).join('')}
+    </nav>` : '';
     return `
       <div class="ai-tools-layout">
-        <h1 class="ai-tools-title">${escapeText(s.title)}</h1>
+        <h1 class="ai-tools-title">${escapeText(s.title)}${titleLink}</h1>
+        ${quickLinks}
         <ul class="ai-tools-points">${points}</ul>
         <img class="ai-tool-image" src="${s.tool_image}" alt="分析ツール">
         <img class="ai-agent-image" src="${s.agent_image}" alt="AIエージェント">
@@ -1492,6 +1555,8 @@ HTML = r"""
           <p class="summary-text">${escapeText(s.summary)}</p>
         </div>
       </aside>` : '';
+    const video = s.video ? `<video class="slide-video" src="${s.video}" controls preload="metadata" playsinline></video>` : '';
+    const note = s.note ? `<aside class="slide-note">${s.note.map(line => `<p>${escapeText(line)}</p>`).join('')}</aside>` : '';
     return `
       <div class="image-slide-layout">
         <h1 class="image-slide-title">${escapeText(s.title)}</h1>
@@ -1499,6 +1564,8 @@ HTML = r"""
         <figure class="image-slide-figure">
           <img src="${s.image}" alt="日報更新の流れ">
         </figure>
+        ${video}
+        ${note}
         ${summary}
       </div>`;
   }
@@ -1545,7 +1612,7 @@ HTML = r"""
             </filter>
           </defs>
         </svg>
-        <h1 class="experience-title">${escapeText(s.title)}</h1>
+        <h1 class="experience-title">${escapeText(s.title)}${s.title_link ? ` <a class="inline-link" href="${s.title_link}" target="_blank" rel="noopener noreferrer">（連結）</a>` : ''}</h1>
         <figure class="experience-card experience-project" data-reveal="1">
           <img src="${project.url}" alt="${escapeText(project.alt)}">
         </figure>
@@ -1732,6 +1799,7 @@ HTML = r"""
   });
 
   stage.addEventListener('click', event => {
+    if (event.target.closest('a, video, button')) return;
     stage.focus({preventScroll: true});
     const rect = stage.getBoundingClientRect();
     const ripple = document.createElement('span');

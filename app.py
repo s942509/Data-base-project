@@ -622,7 +622,7 @@ HTML = r"""
   .inline-link { color: #7135de; text-decoration: none; pointer-events: auto; }
   .inline-link:hover { text-decoration: underline; }
   .quick-links {
-    position: absolute; z-index: 12; left: 7%; top: 66%;
+    position: absolute; z-index: 12; left: 7%; top: 47%;
     display: flex; flex-direction: column; align-items: flex-start;
     gap: .42vw; pointer-events: auto;
   }

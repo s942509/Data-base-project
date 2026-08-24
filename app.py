@@ -96,6 +96,21 @@ SLIDES = [
         "ball2": {"x": -6, "y": -8, "size": 13},
     },
     {
+        "type": "dual_video",
+        "videos": [
+            {
+                "title": "Ｃros毎日自動ダウンロード_ブラウザ自動操作.mp4",
+                "src": video_source("Ｃros毎日自動ダウンロード_ブラウザ自動操作.mp4"),
+            },
+            {
+                "title": "Akune Cros 毎日自動計算入力.mp4",
+                "src": video_source("Akune Cros 毎日自動計算入力.mp4"),
+            },
+        ],
+        "ball1": {"x": 112, "y": 105, "size": 18},
+        "ball2": {"x": -14, "y": -12, "size": 13},
+    },
+    {
         "type": "image_slide",
         "num": "03",
         "title": "媒体数字抽出",
@@ -141,6 +156,13 @@ SLIDES = [
         "title": "請求業務では、同じ項目を複数のシートへ繰り返し入力",
         "image": image_source("slide10.png"),
         "video": video_source("領収書自動反映.mp4"),
+        "ball1": {"x": 116, "y": 112, "size": 18},
+        "ball2": {"x": -16, "y": -14, "size": 13},
+    },
+    {
+        "type": "video_page",
+        "title": "在庫更新",
+        "video": video_source("在庫更新28個商品.mp4"),
         "ball1": {"x": 116, "y": 112, "size": 18},
         "ball2": {"x": -16, "y": -14, "size": 13},
     },
@@ -711,6 +733,32 @@ HTML = r"""
   .slide-video {
     position: absolute; z-index: 9; right: 4.5%; bottom: 7%; width: 35%; max-height: 45%;
     border-radius: 14px; background: #171220; box-shadow: 0 14px 32px rgba(30,13,61,.25);
+    pointer-events: auto;
+  }
+  .dual-video-layout {
+    position: absolute; inset: 0; padding: 6% 4.5% 7%;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3%;
+    align-items: center;
+  }
+  .dual-video-card { min-width: 0; margin: 0; }
+  .dual-video-card figcaption {
+    min-height: 3.4em; margin-bottom: .7em; color: #4b3150;
+    font-size: clamp(11px, 1.25vw, 18px); font-weight: 850; line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+  .dual-video-card video {
+    display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain;
+    border-radius: 14px; background: #171220; box-shadow: 0 14px 32px rgba(30,13,61,.25);
+    pointer-events: auto;
+  }
+  .video-page-layout { position: absolute; inset: 0; padding: 5.5% 4.5% 4%; }
+  .video-page-title {
+    margin: 0 0 1.4%; color: #4b3150; font-size: clamp(23px, 3vw, 42px);
+    font-weight: 900; line-height: 1.2;
+  }
+  .video-page-layout video {
+    display: block; width: 100%; height: 82%; object-fit: contain;
+    border-radius: 16px; background: #171220; box-shadow: 0 16px 38px rgba(30,13,61,.25);
     pointer-events: auto;
   }
   .slide-note {
@@ -1545,6 +1593,23 @@ HTML = r"""
     return `<figure class="full-image-layout"><img src="${s.image}" alt="${escapeText(s.alt || '')}"></figure>`;
   }
 
+  function dualVideoMarkup(s) {
+    const videos = s.videos.map(video => `
+      <figure class="dual-video-card">
+        <figcaption>${escapeText(video.title)}</figcaption>
+        <video src="${video.src}" controls preload="metadata" playsinline></video>
+      </figure>`).join('');
+    return `<div class="dual-video-layout">${videos}</div>`;
+  }
+
+  function videoPageMarkup(s) {
+    return `
+      <div class="video-page-layout">
+        <h1 class="video-page-title">${escapeText(s.title)}</h1>
+        <video src="${s.video}" controls preload="metadata" playsinline></video>
+      </div>`;
+  }
+
   function imageSlideMarkup(s) {
     const titleLink = s.title_link
       ? ` <a class="inline-link" href="${s.title_link}" target="_blank" rel="noopener noreferrer">（連結）</a>`
@@ -1648,6 +1713,8 @@ HTML = r"""
     if (s.type === 'ai_tools') return aiToolsMarkup(s);
     if (s.type === 'steps') return stepsMarkup(s);
     if (s.type === 'full_image') return fullImageMarkup(s);
+    if (s.type === 'dual_video') return dualVideoMarkup(s);
+    if (s.type === 'video_page') return videoPageMarkup(s);
     return sectionMarkup(s);
   }
 

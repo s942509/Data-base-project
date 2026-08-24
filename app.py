@@ -246,6 +246,7 @@ SLIDES = [
         "type": "image_slide",
         "num": "18",
         "title": "公的支援制度は、最新の申請条件を確認して活用",
+        "title_link": "https://www.smebiz.org.tw/project-tenacity_shop.php",
         "image": image_source("money.png"),
         "ball1": {"x": 116, "y": 112, "size": 18},
         "ball2": {"x": -16, "y": -14, "size": 13},
@@ -254,7 +255,6 @@ SLIDES = [
         "type": "image_slide",
         "num": "19",
         "title": "業界における取り組み事例",
-        "title_link": "https://www.smebiz.org.tw/project-tenacity_shop.php",
         "subtitles": [
             "カスタムデータ基盤の構築",
             "社内AIエージェントの構築",
@@ -542,7 +542,7 @@ HTML = r"""
     line-height: 1.5;
   }
   .topic-image {
-    position: absolute; left: 6%; top: 22%; width: 88%; height: 73%;
+    position: absolute; left: 4%; top: 30%; width: 92%; height: 65%;
     object-fit: contain; filter: drop-shadow(0 12px 22px rgba(47,27,78,.15));
   }
   .topic-subtitle::before {
@@ -622,7 +622,7 @@ HTML = r"""
   .inline-link { color: #7135de; text-decoration: none; pointer-events: auto; }
   .inline-link:hover { text-decoration: underline; }
   .quick-links {
-    position: absolute; z-index: 12; left: 7%; top: 20%;
+    position: absolute; z-index: 12; left: 7%; top: 66%;
     display: flex; flex-direction: column; align-items: flex-start;
     gap: .42vw; pointer-events: auto;
   }
@@ -631,7 +631,6 @@ HTML = r"""
     color: #6534b4; background: rgba(255,255,255,.72); text-decoration: none;
     font-size: clamp(9px, .95vw, 14px); font-weight: 800;
   }
-  .ai-tools-layout.has-quick-links .ai-tools-points { left: 20%; top: 25%; width: 35%; }
   .quick-link:hover { color: white; background: #7135de; }
   .ai-tools-points {
     position: absolute; z-index: 8; left: 6%; top: 25%; width: 42%;
